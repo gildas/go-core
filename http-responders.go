@@ -6,9 +6,6 @@ import (
 	"strconv"
 )
 
-// ContextKey type is used with http contexts to store data
-type ContextKey string
-
 // RespondWithError will send a reply with an error as JSON and a HTTP Status code
 func RespondWithError(w http.ResponseWriter, code int, errorMessage string) {
         RespondWithJSON(w, code, map[string]string{
