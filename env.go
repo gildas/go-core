@@ -9,7 +9,7 @@ import (
 // GetEnvAsString returns the string value of an environment variable by its name
 // or of the fallback if it is not present
 func GetEnvAsString(name, fallback string) string {
-	if value, ok := os.LookupEnv(name); ok {
+	if value, ok := os.LookupEnv(name); ok && len(value) > 0 {
 		return value
 	}
 	return fallback
