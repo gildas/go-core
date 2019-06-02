@@ -1,16 +1,29 @@
 package core
 
 import (
-	"time"
 	"os"
 	"strconv"
+	"strings"
+	"time"
 )
 
 // GetEnvAsString returns the string value of an environment variable by its name
 // or of the fallback if it is not present
 func GetEnvAsString(name, fallback string) string {
-	if value, ok := os.LookupEnv(name); ok {
+	if value, ok := os.LookupEnv(name); ok && len(value) > 0 {
 		return value
+	}
+	return fallback
+}
+
+// GetEnvAsBool returns the bool value of an environment variable by its name
+// or of the fallback if it is not present
+func GetEnvAsBool(name string, fallback bool) bool {
+	if value, ok := os.LookupEnv(name); ok && len(value) > 0 {
+		if strings.Contains(strings.ToLower(value), "1onyestrue") {
+			return true
+		}
+		return false
 	}
 	return fallback
 }
