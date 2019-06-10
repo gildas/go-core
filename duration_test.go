@@ -25,7 +25,7 @@ func TestCanUnmarshalDurationFromInt(t *testing.T) {
 }
 
 func TestCanUnmarshalDurationFromISO(t *testing.T) {
-	payload := `{"duration":"P2H30M15S"}`
+	payload := `{"duration":"PT2H30M15S"}`
 	result  := struct{Duration Duration `json:"duration"`}{}
 	err     := json.Unmarshal([]byte(payload), &result)
 	require.Nil(t, err, "Failed to unmarshal duration P2H30M15S, %s", err)
