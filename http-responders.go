@@ -3,16 +3,41 @@ package core
 import (
 	"encoding/json"
 	"net/http"
+	"reflect"
 	"strconv"
 )
 
 // RespondWithError will send a reply with an error as JSON and a HTTP Status code
 func RespondWithError(w http.ResponseWriter, code int, err error) {
-        RespondWithJSON(w, code, map[string]string{
-                "http_status": strconv.Itoa(code),
-                "error": err.Error(),
-                "message": err.Error(),
-        })
+	props := map[string]string{
+		"http_status": strconv.Itoa(code),
+		"error": err.Error(),
+	}
+
+	var field reflect.Value
+	errValue := reflect.ValueOf(err)
+	
+	field = errValue.FieldByName("ID")
+	if field.IsValid() && field.Type().Kind().String() == "string" && field.Len() > 0 {
+		props["id"] = field.String()
+	}
+	field = errValue.FieldByName("What")
+	if field.IsValid() && field.Type().Kind().String() == "string" && field.Len() > 0 {
+		props["what"] = field.String()
+	}
+	if field = errValue.FieldByName("Value"); field.IsValid() && !field.IsNil() {
+		switch field.Type().Kind() {
+		case reflect.String:
+			if field.Len() > 0 {
+				props["value"] = field.String()
+			}
+		case reflect.Interface, reflect.Ptr:
+			if !field.IsNil() {
+				props["value"] = field.String()
+			}
+		}
+	}
+	RespondWithJSON(w, code, props)
 }
 
 // RespondWithJSON will send a reply with a JSON payload and a HTTP Status code
