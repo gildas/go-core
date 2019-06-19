@@ -16,6 +16,11 @@ func RespondWithError(w http.ResponseWriter, code int, err error) {
 
 	var field reflect.Value
 	errValue := reflect.ValueOf(err)
+
+	// detect errors like fmt.Errorf()
+	if errValue.Type().Kind() == reflect.Ptr {
+		errValue = errValue.Elem()
+	}
 	
 	field = errValue.FieldByName("ID")
 	if field.IsValid() && field.Type().Kind().String() == "string" && field.Len() > 0 {
