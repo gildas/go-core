@@ -1,7 +1,6 @@
 package core
 
 import (
-	"fmt"
 	"encoding/json"
 	"net/url"
 )
@@ -22,7 +21,7 @@ func (u *URL) UnmarshalJSON(payload []byte) (err error) {
 		return
 	}
 	if len(inner) == 0 {
-		return fmt.Errorf("Empty JSON String")
+		return nil
 	}
 	parsed, err := url.Parse(inner)
 	if err != nil {
