@@ -130,6 +130,10 @@ func SendRequest(ctx context.Context, options *RequestOptions, results interface
 			resContent.Type = options.Accept
 		}
 		if resContent.Type == "application/octet-stream" {
+			mime.AddExtensionType(".mp3",  "audio/mpeg3")
+			mime.AddExtensionType(".m4a",  "audio/x-m4a")
+			mime.AddExtensionType(".wav",  "audio/wav")
+			mime.AddExtensionType(".jpeg", "image/jpg")
 			if restype := mime.TypeByExtension(filepath.Ext(options.URL.Path)); len(restype) > 0 {
 				resContent.Type = restype
 			}
