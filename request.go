@@ -71,6 +71,14 @@ func SendRequest(ctx context.Context, options *RequestOptions, results interface
 		}
 	}
 
+	if len(options.Accept) == 0 {
+		if results != nil {
+			options.Accept = "application/json"
+		} else {
+			options.Accept = "*"
+		}
+	}
+
 	req, err := http.NewRequest(options.Method, options.URL.String(), reqContent.Reader)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -125,7 +133,7 @@ func SendRequest(ctx context.Context, options *RequestOptions, results interface
 		resContent.Type = "image/jpeg"
 	}
 	if len(resContent.Type) == 0 || resContent.Type == "application/octet-stream" {
-		if len(options.Accept) > 0 {
+		if len(options.Accept) > 0 && options.Accept != "*" {
 			// TODO: well... Accept is not always a simple mime type...
 			resContent.Type = options.Accept
 		}
