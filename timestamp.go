@@ -21,13 +21,16 @@ func TimestampFromJSEpoch(epoch int64) Timestamp {
 }
 
 // MarshalJSON encodes a TimeStamp to its JSON Epoch
+//   implements json.Marshaler interface
 func (t Timestamp) MarshalJSON() ([]byte, error) {
 	// Per Node.js epochs, we need milliseconds
 	return []byte(strconv.FormatInt(t.JSEpoch(), 10)), nil
 }
 
 // UnmarshalJSON decodes an Epoch from JSON and gives a Timestamp
-// The Epoch can be "12345" or 12345
+//   implements json.Unmarshaler interface
+//
+//   The Epoch can be "12345" or 12345
 func (t *Timestamp) UnmarshalJSON(payload []byte) (err error) {
 	// First get rid of the surrounding double quotes
 	unquoted   := strings.Replace(string(payload), `"`, ``, -1)

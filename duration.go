@@ -13,14 +13,18 @@ import (
 type Duration time.Duration
 
 // MarshalJSON marshals this into JSON
-// We store duration in milliseconds
+//   implements json.Marshaler interface
+//
+//   We store duration in milliseconds
 func (duration Duration) MarshalJSON() ([]byte, error) {
 	return json.Marshal(int64(time.Duration(duration)) / int64(1000000))
 }
 
 // UnmarshalJSON decodes JSON
-// an int (int64) will be assumed to be milli-seconds
-// a string will be parsed as an ISO 8601 then as a GO time.Duration
+//   implements json.Unmarshaler interface
+//
+//   an int (int64) will be assumed to be milli-seconds
+//   a string will be parsed as an ISO 8601 then as a GO time.Duration
 func (duration *Duration) UnmarshalJSON(payload []byte) (err error) {
 	var inner interface{}
 	if err := json.Unmarshal(payload, &inner); err != nil {

@@ -9,13 +9,17 @@ import (
 type Time time.Time
 
 // MarshalJSON marshals this into JSON
-// We store time as RFC3339 UTC
+//   implements json.Marshaler interface
+//
+//   We store time as RFC3339 UTC
 func (t Time) MarshalJSON() ([]byte, error) {
 	return json.Marshal(time.Time(t).UTC().Format(time.RFC3339))
 }
 
 // UnmarshalJSON decodes JSON
-// We read time as RFC3339 UTC
+//   implements json.Unmarshaler interface
+//
+//   We read time as RFC3339 UTC
 func (t *Time) UnmarshalJSON(payload []byte) (err error) {
 	var inner string
 	if err = json.Unmarshal(payload, &inner); err != nil {
