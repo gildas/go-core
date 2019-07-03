@@ -64,3 +64,7 @@ func (content *Content) Reader() *ContentReader {
 	}
 	return reader
 }
+
+func (reader ContentReader) Read(data []byte) (int, error) {
+	return reader.Reader.Read(data)
+}
