@@ -23,18 +23,21 @@ import (
 
 // RequestOptions defines options of an HTTP request
 type RequestOptions struct {
-	Method         string
-	URL            *url.URL
-	Proxy          *url.URL
-	Headers        map[string]string
-	Parameters     map[string]string
-	Accept         string
-	Payload        interface{}
-	Content        ContentReader
-	Authentication string
-	RequestID      string
-	UserAgent      string
-	Logger         *logger.Logger
+	Method            string
+	URL               *url.URL
+	Proxy             *url.URL
+	Headers           map[string]string
+	Parameters        map[string]string
+	Accept            string
+	Payload           interface{}
+	Content           ContentReader
+	Authentication    string
+	RequestID         string
+	UserAgent         string
+	Attempts          int
+	InterAttemptDelay time.Duration
+	Timeout           time.Duration
+	Logger            *logger.Logger
 }
 
 // RequestError is returned when an HTTP Status is >= 400
@@ -42,6 +45,15 @@ type RequestError struct {
 	StatusCode int    `json:"statusCode"`
 	Status     string `json:"status"`
 }
+
+// DefaultAttempts defines the number of attempts for requests by default
+const DefaultAttempts = 5
+
+// DefaultTimeout defunes the timeout for a request
+const DefaultTimeout  = 2 * time.Second
+
+// DefaultInterAttemptDelay defines the sleep delay between 2 attempts
+const DefaultInterAttemptDelay = 1 * time.Second
 
 // SendRequest sends an HTTP request
 func SendRequest(ctx context.Context, options *RequestOptions, results interface{}) (*ContentReader, error) {
@@ -79,6 +91,18 @@ func SendRequest(ctx context.Context, options *RequestOptions, results interface
 		}
 	}
 
+	if options.Attempts < 1 {
+		options.Attempts = DefaultAttempts
+	}
+
+	if options.InterAttemptDelay < 1 * time.Second {
+		options.InterAttemptDelay = time.Duration(DefaultInterAttemptDelay)
+	}
+
+	if options.Timeout == 0 {
+		options.Timeout = time.Duration(DefaultTimeout)
+	}
+
 	req, err := http.NewRequest(options.Method, options.URL.String(), reqContent.Reader)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -98,77 +122,83 @@ func SendRequest(ctx context.Context, options *RequestOptions, results interface
 		req.Header.Set(key, value)
 	}
 
-	// Sending the request...
-	log.Debugf("HTTP %s %s", req.Method, req.URL.String())
-	log.Tracef("Request Headers: %#v", req.Header)
 	httpclient := http.Client{
 		CheckRedirect: func(r *http.Request, via []*http.Request) error {
 			r.URL.Opaque = r.URL.Path
 			return nil
 		},
+		Timeout: options.Timeout,
 	}
 	if options.Proxy != nil {
 		httpclient.Transport = &http.Transport{Proxy: http.ProxyURL(options.Proxy)}
 	}
-	start    := time.Now()
-	res, err := httpclient.Do(req)
-	duration := time.Since(start)
-	log      = log.Record("duration", duration)
-	if err != nil {
-		log.Errorf("Failed to send request", err)
-		return nil, errors.WithStack(err)
-	}
-	defer res.Body.Close()
-	log.Debugf("Response %s in %s", res.Status, duration)
-	log.Tracef("Response Headers: %#v", res.Header)
-
-	// Reading the response body
-	resContent, err := ContentFromReader(res.Body, res.Header.Get("Content-Type"), Atoi(res.Header.Get("Content-Length"), 0))
-	if err != nil {
-		log.Errorf("Failed to read response body", err)
-		return nil, errors.WithStack(err)
-	}
-	// some servers give the wrong mime type for JPEG files
-	if resContent.Type == "image/jpg" {
-		resContent.Type = "image/jpeg"
-	}
-	if len(resContent.Type) == 0 || resContent.Type == "application/octet-stream" {
-		if len(options.Accept) > 0 && options.Accept != "*" {
-			// TODO: well... Accept is not always a simple mime type...
-			resContent.Type = options.Accept
+	// Sending the request...
+	for attempt := 0; attempt < options.Attempts; attempt++ {
+		log.Debugf("HTTP %s %s #%d/%d", req.Method, req.URL.String(), attempt, options.Attempts)
+		log.Tracef("Request Headers: %#v", req.Header)
+		start    := time.Now()
+		res, err := httpclient.Do(req)
+		duration := time.Since(start)
+		log      = log.Record("duration", duration)
+		if err != nil {
+			log.Errorf("Failed to send request, waiting for %s before trying again", options.InterAttemptDelay, err)
+			time.Sleep(options.InterAttemptDelay)
+			continue
 		}
-		if resContent.Type == "application/octet-stream" {
-			mime.AddExtensionType(".mp3",  "audio/mpeg3")
-			mime.AddExtensionType(".m4a",  "audio/x-m4a")
-			mime.AddExtensionType(".wav",  "audio/wav")
-			mime.AddExtensionType(".jpeg", "image/jpg")
-			if restype := mime.TypeByExtension(filepath.Ext(options.URL.Path)); len(restype) > 0 {
-				resContent.Type = restype
+		defer res.Body.Close()
+		log.Debugf("Response %s in %s", res.Status, duration)
+		log.Tracef("Response Headers: %#v", res.Header)
+
+		// Reading the response body
+		resContent, err := ContentFromReader(res.Body, res.Header.Get("Content-Type"), Atoi(res.Header.Get("Content-Length"), 0))
+		if err != nil {
+			log.Errorf("Failed to read response body", err)
+			return nil, errors.WithStack(err)
+		}
+		// some servers give the wrong mime type for JPEG files
+		if resContent.Type == "image/jpg" {
+			resContent.Type = "image/jpeg"
+		}
+		if len(resContent.Type) == 0 || resContent.Type == "application/octet-stream" {
+			if len(options.Accept) > 0 && options.Accept != "*" {
+				// TODO: well... Accept is not always a simple mime type...
+				resContent.Type = options.Accept
+			}
+			if resContent.Type == "application/octet-stream" {
+				mime.AddExtensionType(".mp3",  "audio/mpeg3")
+				mime.AddExtensionType(".m4a",  "audio/x-m4a")
+				mime.AddExtensionType(".wav",  "audio/wav")
+				mime.AddExtensionType(".jpeg", "image/jpg")
+				if restype := mime.TypeByExtension(filepath.Ext(options.URL.Path)); len(restype) > 0 {
+					resContent.Type = restype
+				}
 			}
 		}
-	}
-	log.Tracef("Response body (%s, %d bytes): %s", resContent.Type, resContent.Length, string(resContent.Data[:int(math.Min(1024,float64(resContent.Length)))]))
+		log.Tracef("Response body (%s, %d bytes): %s", resContent.Type, resContent.Length, string(resContent.Data[:int(math.Min(1024,float64(resContent.Length)))]))
 
-	// Processing the status
-	if res.StatusCode == http.StatusFound {
-		follow, err := res.Location()
-		if err == nil {
-			log.Warnf("TODO: we should get stuff from %s", follow.String())
+		// Unmarshaling the content if requested (doing this now allows for retrieving JSON errors)
+		if results != nil {
+			err = json.Unmarshal(resContent.Data, results)
+			if err != nil {
+				log.Errorf("Failed to decode response, use the ContentReader", err)
+			}
 		}
-	}
-	if res.StatusCode >= 400 {
-		return resContent.Reader(), errors.WithStack(RequestError{res.StatusCode, res.Status})
-	}
 
-	// Unmarshaling the content if requested
-	if results != nil {
-		err = json.Unmarshal(resContent.Data, results)
-		if err != nil {
-			log.Errorf("Failed to decode response", err)
-			return resContent.Reader(), errors.WithStack(err)
+		// Processing the status
+		if res.StatusCode == http.StatusFound {
+			follow, err := res.Location()
+			if err == nil {
+				log.Warnf("TODO: we should get stuff from %s", follow.String())
+			}
 		}
+		if res.StatusCode >= 400 {
+			return resContent.Reader(), errors.WithStack(RequestError{res.StatusCode, res.Status})
+		}
+
+		return resContent.Reader(), nil
 	}
-	return resContent.Reader(), nil
+	// If we get here, there is an error
+	return nil, errors.Wrapf(err, "Giving up after %d attempts", options.Attempts)
 }
 
 func (err RequestError) Error() string {
