@@ -30,7 +30,7 @@ func RespondWithError(w http.ResponseWriter, code int, err error) {
 	if field.IsValid() && field.Type().Kind().String() == "string" && field.Len() > 0 {
 		props["what"] = field.String()
 	}
-	if field = errValue.FieldByName("Value"); field.IsValid() && !field.IsNil() {
+	if field = errValue.FieldByName("Value"); field.IsValid() {
 		switch field.Type().Kind() {
 		case reflect.String:
 			if field.Len() > 0 {
