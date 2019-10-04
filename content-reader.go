@@ -1,6 +1,7 @@
 package core
 
 import (
+	"encoding/json"
 	"bytes"
 	"io"
 	"io/ioutil"
@@ -50,6 +51,18 @@ func ContentFromReader(reader io.Reader, options... interface{}) (*Content, erro
 		return nil, err
 	}
 	return ContentWithData(data, options...), nil
+}
+
+// ReadContent instantiates a Content from an I/O reader
+func (reader ContentReader) ReadContent(options... interface{}) (*Content, error) {
+	return ContentFromReader(reader, options...)
+}
+
+// UnmarshalContentJSON reads the content of an I/O reader and unmarshals it into JSON
+func (reader ContentReader) UnmarshalContentJSON(v interface{}) (err error) {
+	content, err := reader.ReadContent()
+	if err != nil { return err }
+	return json.Unmarshal(content.Data, &v)
 }
 
 // Reader gets a ContentReader from this Content
