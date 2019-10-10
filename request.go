@@ -32,7 +32,7 @@ type RequestOptions struct {
 	Accept            string
 	Payload           interface{}
 	Content           ContentReader
-	Authentication    string
+	Authorization     string
 	RequestID         string
 	UserAgent         string
 	Attempts          int
@@ -116,6 +116,9 @@ func SendRequest(options *RequestOptions, results interface{}) (*ContentReader, 
 	req.Header.Set("User-Agent",   options.UserAgent)
 	req.Header.Set("Accept",       options.Accept)
 	req.Header.Set("X-Request-Id", options.RequestID)
+	if len(options.Authorization) > 0 {
+		req.Header.Set("Authorization", options.Authorization)
+	}
 	if len(reqContent.Type) > 0 {
 		req.Header.Set("Content-Type", reqContent.Type)
 	}
