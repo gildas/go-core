@@ -65,7 +65,7 @@ func SendRequest(options *RequestOptions, results interface{}) (*ContentReader, 
 		return nil, errors.WithStack(fmt.Errorf("error.url.empty"))
 	}
 
-	log := logger.CreateWithSink(nil)
+	log := logger.CreateWithSink(nil) // without a logger, let's log into the "void"
 	if options.Logger != nil {
 		log = options.Logger.Scope("request")
 	}
