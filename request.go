@@ -189,25 +189,26 @@ func SendRequest(options *RequestOptions, results interface{}) (*ContentReader, 
 		}
 		log.Tracef("Response body (%s, %d bytes): %s", resContent.Type, resContent.Length, string(resContent.Data[:int(math.Min(1024,float64(resContent.Length)))]))
 
-		// Unmarshaling the response content if requested (doing this now allows for retrieving JSON errors)
+		if res.StatusCode >= 400 {
+			return resContent.Reader(), errors.WithStack(RequestError{res.StatusCode, res.Status})
+		}
+
+		// Processing the status
+		if res.StatusCode == http.StatusFound {
+			// TODO: Handle redirections
+			follow, err := res.Location()
+			if err == nil {
+				log.Warnf("TODO: we should get stuff from %s", follow.String())
+			}
+		}
+
+		// Unmarshaling the response content if requested
 		if results != nil {
 			err = json.Unmarshal(resContent.Data, results)
 			if err != nil {
 				log.Errorf("Failed to decode response, use the ContentReader", err)
 			}
 		}
-
-		// Processing the status
-		if res.StatusCode == http.StatusFound {
-			follow, err := res.Location()
-			if err == nil {
-				log.Warnf("TODO: we should get stuff from %s", follow.String())
-			}
-		}
-		if res.StatusCode >= 400 {
-			return resContent.Reader(), errors.WithStack(RequestError{res.StatusCode, res.Status})
-		}
-
 		return resContent.Reader(), nil
 	}
 	// If we get here, there is an error
