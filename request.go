@@ -23,6 +23,7 @@ import (
 
 // RequestOptions defines options of an HTTP request
 type RequestOptions struct {
+	Context           context.Context
 	Method            string
 	URL               *url.URL
 	Proxy             *url.URL
@@ -56,7 +57,10 @@ const DefaultTimeout  = 2 * time.Second
 const DefaultInterAttemptDelay = 1 * time.Second
 
 // SendRequest sends an HTTP request
-func SendRequest(ctx context.Context, options *RequestOptions, results interface{}) (*ContentReader, error) {
+func SendRequest(options *RequestOptions, results interface{}) (*ContentReader, error) {
+	if options.Context == nil {
+		options.Context = context.Background()
+	}
 	if options.URL == nil {
 		return nil, errors.WithStack(fmt.Errorf("error.url.empty"))
 	}
