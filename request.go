@@ -1,9 +1,8 @@
 package core
 
 import (
-	"reflect"
-	"context"
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -13,6 +12,7 @@ import (
 	"net/http"
 	"net/url"
 	"path/filepath"
+	"reflect"
 	"strconv"
 	"strings"
 	"time"
@@ -31,7 +31,7 @@ type RequestOptions struct {
 	Headers           map[string]string
 	Parameters        map[string]string
 	Accept            string
-	PayloadType       string      // if not provided, it is computed. payload==struct => json, payload==map => form
+	PayloadType       string         // if not provided, it is computed. payload==struct => json, payload==map => form
 	Payload           interface{}
 	Attachment        *ContentReader // binary data that should be attached to the paylod (e.g.: multipart forms)
 	Authorization     string
@@ -68,7 +68,7 @@ func SendRequest(options *RequestOptions, results interface{}) (*ContentReader, 
 		options.Context = context.Background()
 	}
 	if options.URL == nil {
-		return nil, errors.WithStack(fmt.Errorf("error.url.empty"))
+		return nil, errors.New("error.url.empty")
 	}
 
 	log := logger.CreateWithSink(nil) // without a logger, let's log into the "void"
@@ -82,7 +82,7 @@ func SendRequest(options *RequestOptions, results interface{}) (*ContentReader, 
 
 	reqContent, err := buildRequestContent(log, options)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err // err is already decorated
 	}
 
 	if len(options.Method) == 0 {
@@ -92,6 +92,7 @@ func SendRequest(options *RequestOptions, results interface{}) (*ContentReader, 
 			options.Method = "GET"
 		}
 	}
+	log = log.Record("method", options.Method)
 
 	if len(options.Accept) == 0 {
 		if results != nil {
@@ -187,9 +188,10 @@ func SendRequest(options *RequestOptions, results interface{}) (*ContentReader, 
 				}
 			}
 		}
-		log.Tracef("Response body (%s, %d bytes): %s", resContent.Type, resContent.Length, string(resContent.Data[:int(math.Min(1024,float64(resContent.Length)))]))
+		log.Tracef("Response body (%s, %d bytes): %s", resContent.Type, resContent.Length, string(resContent.Data[:int(math.Min(1024, float64(resContent.Length)))]))
 
 		if res.StatusCode >= 400 {
+			log.Debugf("Status: %s (Code %d)", res.Status, res.StatusCode)
 			return resContent.Reader(), errors.WithStack(RequestError{res.StatusCode, res.Status})
 		}
 
@@ -241,16 +243,16 @@ func buildRequestContent(log *logger.Logger, options *RequestOptions) (*ContentR
 			return content.Reader(), nil
 		}
 		return &contentReader, nil
-/*
-	} else if contentReader, ok := options.Payload.(*ContentReader); ok {
-		log.Tracef("Payload is a *ContentReader (Type: %s, size: %d)", contentReader.Type, contentReader.Length)
-		if contentReader.Length > 0 {
-			content, _ = ContentFromReader(contentReader, contentReader.Type)
-			if len(content.Type) == 0 {
-				content.Type = "application/octet-stream"
-			}
-		} // else the returned contentReader will be empty
-*/
+		/*
+			} else if contentReader, ok := options.Payload.(*ContentReader); ok {
+				log.Tracef("Payload is a *ContentReader (Type: %s, size: %d)", contentReader.Type, contentReader.Length)
+				if contentReader.Length > 0 {
+					content, _ = ContentFromReader(contentReader, contentReader.Type)
+					if len(content.Type) == 0 {
+						content.Type = "application/octet-stream"
+					}
+				} // else the returned contentReader will be empty
+		*/
 	} else if content, ok := options.Payload.(Content); ok {
 		// Here we ignore options.PayloadType as the Content embeds its ContentType
 		log.Tracef("Payload is a Content (Type: %s, size: %d)", content.Type, content.Length)
@@ -280,7 +282,7 @@ func buildRequestContent(log *logger.Logger, options *RequestOptions) (*ContentR
 		} else {
 			keyType   := payloadType.Key()
 			valueType := payloadType.Elem()
-			return nil, errors.New(fmt.Sprintf("Unsupported Payload map (map[%s]%s)", keyType.String(), valueType.String()))
+			return nil, errors.Errorf("Unsupported Payload map (map[%s]%s)", keyType.String(), valueType.String())
 		}
 
 		// Build the content as a Form or a Multipart Data Form
@@ -303,23 +305,23 @@ func buildRequestContent(log *logger.Logger, options *RequestOptions) (*ContentR
 			if strings.HasPrefix(key, ">") {
 				key = strings.TrimPrefix(key, ">")
 				if len(value) == 0 {
-					return nil, errors.WithStack(fmt.Errorf("Empty value for multipart form field %s", key))
+					return nil, errors.Errorf("Empty value for multipart form field %s", key)
 				}
 				part, err := writer.CreateFormFile(key, value)
 				if err != nil {
-					return nil, errors.Wrap(err, fmt.Sprintf("Failed to create multipart for field %s", key))
+					return nil, errors.Wrapf(err, "Failed to create multipart for field %s", key)
 				}
 				if options.Attachment.Length == 0 {
-					return nil, errors.WithStack(fmt.Errorf("Missing/Empty Attachment for multipart form field %s", key))
+					return nil, errors.Errorf("Missing/Empty Attachment for multipart form field %s", key)
 				}
 				written, err := io.Copy(part, options.Attachment)
 				if err != nil {
-					return nil, errors.Wrap(err, fmt.Sprintf("Failed to write attachment to multipart form field %s", key))
+					return nil, errors.Errorf("Failed to write attachment to multipart form field %s", key)
 				}
 				log.Tracef("Wrote %d bytes to multipart form field %s", written, key)
 			} else {
 				if err := writer.WriteField(key, value); err != nil {
-					return nil, errors.Wrap(err, fmt.Sprintf("Failed to create multipart form field %s", key))
+					return nil, errors.Wrapf(err, "Failed to create multipart form field %s", key)
 				}
 				log.Tracef("  Added field %s = %s", key, value)
 			}
@@ -331,4 +333,4 @@ func buildRequestContent(log *logger.Logger, options *RequestOptions) (*ContentR
 		return content.Reader(), nil
 	}
 	return nil, errors.New("Unsupported Payload")
-} 
+}
