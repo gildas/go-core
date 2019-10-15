@@ -114,6 +114,15 @@ func SendRequest(options *RequestOptions, results interface{}) (*ContentReader, 
 		options.Timeout = time.Duration(DefaultTimeout)
 	}
 
+	if options.Parameters != nil {
+		log.Tracef("Adding query parameters")
+		query := options.URL.Query()
+		for key, value := range options.Parameters {
+			query.Add(key, value)
+		}
+		options.URL.RawQuery = query.Encode()
+	}
+
 	req, err := http.NewRequest(options.Method, options.URL.String(), reqContent.Reader)
 	if err != nil {
 		return nil, errors.WithStack(err)
