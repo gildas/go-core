@@ -24,23 +24,24 @@ import (
 
 // RequestOptions defines options of an HTTP request
 type RequestOptions struct {
-	Context           context.Context
-	Method            string
-	URL               *url.URL
-	Proxy             *url.URL
-	Headers           map[string]string
-	Parameters        map[string]string
-	Accept            string
-	PayloadType       string         // if not provided, it is computed. payload==struct => json, payload==map => form
-	Payload           interface{}
-	Attachment        *ContentReader // binary data that should be attached to the paylod (e.g.: multipart forms)
-	Authorization     string
-	RequestID         string
-	UserAgent         string
-	Attempts          int
-	InterAttemptDelay time.Duration
-	Timeout           time.Duration
-	Logger            *logger.Logger
+	Context             context.Context
+	Method              string
+	URL                 *url.URL
+	Proxy               *url.URL
+	Headers             map[string]string
+	Parameters          map[string]string
+	Accept              string
+	PayloadType         string         // if not provided, it is computed. payload==struct => json, payload==map => form
+	Payload             interface{}
+	Attachment          *ContentReader // binary data that should be attached to the paylod (e.g.: multipart forms)
+	Authorization       string
+	RequestID           string
+	UserAgent           string
+	Attempts            int
+	InterAttemptDelay   time.Duration
+	Timeout             time.Duration
+	ResponseBodyLogSize int            // how many characters of the response body should be logged (<0 => nothing logged)
+	Logger              *logger.Logger
 }
 
 // RequestError is returned when an HTTP Status is >= 400
@@ -57,6 +58,9 @@ const DefaultTimeout  = 2 * time.Second
 
 // DefaultInterAttemptDelay defines the sleep delay between 2 attempts
 const DefaultInterAttemptDelay = 1 * time.Second
+
+// DefaultResponseBodyLogSize  defines the maximum size of the response body that should be logge
+const DefaultResponseBodyLogSize = 2048
 
 func (err RequestError) Error() string {
 	return err.Status
@@ -108,6 +112,12 @@ func SendRequest(options *RequestOptions, results interface{}) (*ContentReader, 
 
 	if options.InterAttemptDelay < 1 * time.Second {
 		options.InterAttemptDelay = time.Duration(DefaultInterAttemptDelay)
+	}
+
+	if options.ResponseBodyLogSize == 0 {
+		options.ResponseBodyLogSize = DefaultResponseBodyLogSize
+	} else if options.ResponseBodyLogSize < 0 {
+		options.ResponseBodyLogSize = 0
 	}
 
 	if options.Timeout == 0 {
@@ -197,7 +207,11 @@ func SendRequest(options *RequestOptions, results interface{}) (*ContentReader, 
 				}
 			}
 		}
-		log.Tracef("Response body (%s, %d bytes): %s", resContent.Type, resContent.Length, string(resContent.Data[:int(math.Min(1024, float64(resContent.Length)))]))
+		if options.ResponseBodyLogSize > 0 {
+			log.Tracef("Response body: %s, %d bytes: \n%s", resContent.Type, resContent.Length, string(resContent.Data[:int(math.Min(float64(options.ResponseBodyLogSize), float64(resContent.Length)))]))
+		} else {
+			log.Tracef("Response body: %s, %d bytes", resContent.Type, resContent.Length)
+		}
 
 		if res.StatusCode >= 400 {
 			log.Debugf("Status: %s (Code %d)", res.Status, res.StatusCode)
