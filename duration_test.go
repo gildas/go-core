@@ -1,11 +1,13 @@
 package core_test
 
 import (
-	"gotest.tools/assert"
-	"github.com/stretchr/testify/require"
 	"encoding/json"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	. "github.com/gildas/go-core"
 )
 

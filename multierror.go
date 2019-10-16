@@ -24,9 +24,11 @@ func (me MultiError) HasErrors() bool {
 	return len(me.Errors) > 0
 }
 
-// Append appends a new error
+// Append appends a new error if any
 func (me *MultiError) Append(err error) (*MultiError) {
-	me.Errors = append(me.Errors, err)
+	if err != nil {
+		me.Errors = append(me.Errors, err)
+	}
 	return me
 }
 
