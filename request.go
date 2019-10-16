@@ -291,6 +291,17 @@ func buildRequestContent(log *logger.Logger, options *RequestOptions) (*ContentR
 			return nil, errors.Wrap(err, "Failed to encode payload into JSON")
 		}
 		return ContentWithData(payload, options.PayloadType).Reader(), nil
+	} else if payloadType.Kind() == reflect.Array || payloadType.Kind() == reflect.Slice {
+		log.Tracef("Payload is an array or a slice, JSONifying it")
+		// TODO: Add other payload types like XML, etc
+		if len(options.PayloadType) == 0 {
+			options.PayloadType = "application/json"
+		}
+		payload, err := json.Marshal(options.Payload)
+		if err != nil {
+			return nil, errors.Wrap(err, "Failed to encode payload into JSON")
+		}
+		return ContentWithData(payload, options.PayloadType).Reader(), nil
 	} else if payloadType.Kind() == reflect.Map {
 		// Collect the attributes from the map
 		attributes := map[string]string{}
@@ -355,5 +366,5 @@ func buildRequestContent(log *logger.Logger, options *RequestOptions) (*ContentR
 		content, _ := ContentFromReader(body, writer.FormDataContentType())
 		return content.Reader(), nil
 	}
-	return nil, errors.New("Unsupported Payload")
+	return nil, errors.Errorf("Unsupported Payload: %s", payloadType.Kind().String())
 }
