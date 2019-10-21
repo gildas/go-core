@@ -40,6 +40,7 @@ type RequestOptions struct {
 	Attempts            int
 	InterAttemptDelay   time.Duration
 	Timeout             time.Duration
+	RequestBodyLogSize  int            // how many characters of the request body should be logged, if possible (<0 => nothing logged)
 	ResponseBodyLogSize int            // how many characters of the response body should be logged (<0 => nothing logged)
 	Logger              *logger.Logger
 }
@@ -58,6 +59,9 @@ const DefaultTimeout  = 2 * time.Second
 
 // DefaultInterAttemptDelay defines the sleep delay between 2 attempts
 const DefaultInterAttemptDelay = 1 * time.Second
+
+// DefaultRequestBodyLogSize  defines the maximum size of the request body that should be logge
+const DefaultRequestBodyLogSize = 2048
 
 // DefaultResponseBodyLogSize  defines the maximum size of the response body that should be logge
 const DefaultResponseBodyLogSize = 2048
@@ -83,6 +87,12 @@ func SendRequest(options *RequestOptions, results interface{}) (*ContentReader, 
 		options.RequestID = uuid.Must(uuid.NewRandom()).String()
 	}
 	log = log.Record("reqid", options.RequestID)
+
+	if options.RequestBodyLogSize == 0 {
+		options.RequestBodyLogSize = DefaultRequestBodyLogSize
+	} else if options.RequestBodyLogSize < 0 {
+		options.RequestBodyLogSize = 0
+	}
 
 	reqContent, err := buildRequestContent(log, options)
 	if err != nil {
@@ -290,6 +300,11 @@ func buildRequestContent(log *logger.Logger, options *RequestOptions) (*ContentR
 		if err != nil {
 			return nil, errors.Wrap(err, "Failed to encode payload into JSON")
 		}
+		if options.RequestBodyLogSize > 0 {
+			log.Tracef("Request body %d bytes: \n%s", len(payload), string(payload[:int(math.Min(float64(options.RequestBodyLogSize), float64(len(payload))))]))
+		} else {
+			log.Tracef("Request body %d bytes", len(payload))
+		}
 		return ContentWithData(payload, options.PayloadType).Reader(), nil
 	} else if payloadType.Kind() == reflect.Array || payloadType.Kind() == reflect.Slice {
 		log.Tracef("Payload is an array or a slice, JSONifying it")
@@ -300,6 +315,11 @@ func buildRequestContent(log *logger.Logger, options *RequestOptions) (*ContentR
 		payload, err := json.Marshal(options.Payload)
 		if err != nil {
 			return nil, errors.Wrap(err, "Failed to encode payload into JSON")
+		}
+		if options.RequestBodyLogSize > 0 {
+			log.Tracef("Request body %d bytes: \n%s", len(payload), string(payload[:int(math.Min(float64(options.RequestBodyLogSize), float64(len(payload))))]))
+		} else {
+			log.Tracef("Request body %d bytes", len(payload))
 		}
 		return ContentWithData(payload, options.PayloadType).Reader(), nil
 	} else if payloadType.Kind() == reflect.Map {
