@@ -78,15 +78,12 @@ func SendRequest(options *RequestOptions, results interface{}) (*ContentReader, 
 	if options.URL == nil {
 		return nil, errors.New("error.url.empty")
 	}
-
-	log := logger.CreateWithSink(nil) // without a logger, let's log into the "void"
-	if options.Logger != nil {
-		log = options.Logger.Scope("request")
-	}
 	if len(options.RequestID) == 0 {
 		options.RequestID = uuid.Must(uuid.NewRandom()).String()
 	}
-	log = log.Record("reqid", options.RequestID)
+
+	// without a logger, let's log into the "void"
+	log := logger.CreateIfNil(options.Logger, "request").Child("", "request", "reqid", options.RequestID)
 
 	if options.RequestBodyLogSize == 0 {
 		options.RequestBodyLogSize = DefaultRequestBodyLogSize
@@ -208,10 +205,10 @@ func SendRequest(options *RequestOptions, results interface{}) (*ContentReader, 
 				resContent.Type = options.Accept
 			}
 			if resContent.Type == "application/octet-stream" {
-				mime.AddExtensionType(".mp3",  "audio/mpeg3")
-				mime.AddExtensionType(".m4a",  "audio/x-m4a")
-				mime.AddExtensionType(".wav",  "audio/wav")
-				mime.AddExtensionType(".jpeg", "image/jpg")
+				_ = mime.AddExtensionType(".mp3",  "audio/mpeg3")
+				_ = mime.AddExtensionType(".m4a",  "audio/x-m4a")
+				_ = mime.AddExtensionType(".wav",  "audio/wav")
+				_ = mime.AddExtensionType(".jpeg", "image/jpg")
 				if restype := mime.TypeByExtension(filepath.Ext(options.URL.Path)); len(restype) > 0 {
 					resContent.Type = restype
 				}
