@@ -40,6 +40,7 @@ type RequestOptions struct {
 	Attempts            int
 	InterAttemptDelay   time.Duration
 	Timeout             time.Duration
+	RequestBodyLogSize  int            // how many characters of the request body should be logged, if possible (<0 => nothing logged)
 	ResponseBodyLogSize int            // how many characters of the response body should be logged (<0 => nothing logged)
 	Logger              *logger.Logger
 }
@@ -59,6 +60,9 @@ const DefaultTimeout  = 2 * time.Second
 // DefaultInterAttemptDelay defines the sleep delay between 2 attempts
 const DefaultInterAttemptDelay = 1 * time.Second
 
+// DefaultRequestBodyLogSize  defines the maximum size of the request body that should be logge
+const DefaultRequestBodyLogSize = 2048
+
 // DefaultResponseBodyLogSize  defines the maximum size of the response body that should be logge
 const DefaultResponseBodyLogSize = 2048
 
@@ -74,15 +78,18 @@ func SendRequest(options *RequestOptions, results interface{}) (*ContentReader, 
 	if options.URL == nil {
 		return nil, errors.New("error.url.empty")
 	}
-
-	log := logger.CreateWithSink(nil) // without a logger, let's log into the "void"
-	if options.Logger != nil {
-		log = options.Logger.Scope("request")
-	}
 	if len(options.RequestID) == 0 {
 		options.RequestID = uuid.Must(uuid.NewRandom()).String()
 	}
-	log = log.Record("reqid", options.RequestID)
+
+	// without a logger, let's log into the "void"
+	log := logger.CreateIfNil(options.Logger, "request").Child("", "request", "reqid", options.RequestID)
+
+	if options.RequestBodyLogSize == 0 {
+		options.RequestBodyLogSize = DefaultRequestBodyLogSize
+	} else if options.RequestBodyLogSize < 0 {
+		options.RequestBodyLogSize = 0
+	}
 
 	reqContent, err := buildRequestContent(log, options)
 	if err != nil {
@@ -198,10 +205,10 @@ func SendRequest(options *RequestOptions, results interface{}) (*ContentReader, 
 				resContent.Type = options.Accept
 			}
 			if resContent.Type == "application/octet-stream" {
-				mime.AddExtensionType(".mp3",  "audio/mpeg3")
-				mime.AddExtensionType(".m4a",  "audio/x-m4a")
-				mime.AddExtensionType(".wav",  "audio/wav")
-				mime.AddExtensionType(".jpeg", "image/jpg")
+				_ = mime.AddExtensionType(".mp3",  "audio/mpeg3")
+				_ = mime.AddExtensionType(".m4a",  "audio/x-m4a")
+				_ = mime.AddExtensionType(".wav",  "audio/wav")
+				_ = mime.AddExtensionType(".jpeg", "image/jpg")
 				if restype := mime.TypeByExtension(filepath.Ext(options.URL.Path)); len(restype) > 0 {
 					resContent.Type = restype
 				}
@@ -290,6 +297,11 @@ func buildRequestContent(log *logger.Logger, options *RequestOptions) (*ContentR
 		if err != nil {
 			return nil, errors.Wrap(err, "Failed to encode payload into JSON")
 		}
+		if options.RequestBodyLogSize > 0 {
+			log.Tracef("Request body %d bytes: \n%s", len(payload), string(payload[:int(math.Min(float64(options.RequestBodyLogSize), float64(len(payload))))]))
+		} else {
+			log.Tracef("Request body %d bytes", len(payload))
+		}
 		return ContentWithData(payload, options.PayloadType).Reader(), nil
 	} else if payloadType.Kind() == reflect.Array || payloadType.Kind() == reflect.Slice {
 		log.Tracef("Payload is an array or a slice, JSONifying it")
@@ -300,6 +312,11 @@ func buildRequestContent(log *logger.Logger, options *RequestOptions) (*ContentR
 		payload, err := json.Marshal(options.Payload)
 		if err != nil {
 			return nil, errors.Wrap(err, "Failed to encode payload into JSON")
+		}
+		if options.RequestBodyLogSize > 0 {
+			log.Tracef("Request body %d bytes: \n%s", len(payload), string(payload[:int(math.Min(float64(options.RequestBodyLogSize), float64(len(payload))))]))
+		} else {
+			log.Tracef("Request body %d bytes", len(payload))
 		}
 		return ContentWithData(payload, options.PayloadType).Reader(), nil
 	} else if payloadType.Kind() == reflect.Map {
