@@ -53,13 +53,17 @@ func (duration *Duration) UnmarshalJSON(payload []byte) (err error) {
 }
 
 // ParseDuration parses an ISO8601 duration
-func ParseDuration(iso8601 string) (duration time.Duration, err error) {
+//   If the given value is not an ISO8601 duration, returns time.ParseDuration
+func ParseDuration(value string) (duration time.Duration, err error) {
 	parser := regexp.MustCompile(`P(?P<years>\d+Y)?(?P<months>\d+M)?(?P<weeks>\d+W)?(?P<days>\d+D)?T?(?P<hours>\d+H)?(?P<minutes>\d+M)?(?P<seconds>\d+S)?`)
-	matches := parser.FindStringSubmatch(iso8601)
+	matches := parser.FindStringSubmatch(value)
 	var parsed int
 
 	if len(matches) == 0 {
-		return time.Duration(0), fmt.Errorf(`"%s" is not an ISO8601 duration`, iso8601)
+		if strings.HasSuffix(value, "h") || strings.HasSuffix(value, "m") || strings.HasSuffix(value, "s") {
+			return time.ParseDuration(value)
+		}
+		return time.Duration(0), fmt.Errorf(`"%s" is not an ISO8601 duration`, value)
 	}
 	if len(matches[1]) > 0 {
 		if parsed, err = strconv.Atoi(matches[1][:len(matches[1])-1]); err != nil {
