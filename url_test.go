@@ -11,6 +11,18 @@ import (
 	. "github.com/gildas/go-core"
 )
 
+func TestURLCanConvertToStandardURL(t *testing.T) {
+	testURL, _ := url.Parse("https://www.acme.com")
+	coreURL := (*URL)(testURL)
+	assert.Equal(t, *testURL, coreURL.AsURL())
+}
+
+func TestURLCanConvertToString(t *testing.T) {
+	testURL, _ := url.Parse("https://www.acme.com")
+	coreURL := (*URL)(testURL)
+	assert.Equal(t, "https://www.acme.com", coreURL.String())
+}
+
 func TestCanMarshalURLPtr(t *testing.T) {
 	jsonString := `{"link":"https://www.acme.com"}`
 	testURL, _ := url.Parse("https://www.acme.com")
