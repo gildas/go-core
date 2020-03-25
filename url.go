@@ -8,6 +8,11 @@ import (
 // URL is a placeholder so we can add new funcs to the type
 type URL url.URL
 
+// AsURL converts a core.URL into a url.URL
+func (u URL) AsURL() url.URL {
+	return (url.URL)(u)
+}
+
 // MarshalJSON marshals this into JSON
 //   implements json.Marshaler interface
 func (u URL) MarshalJSON() ([]byte, error) {
