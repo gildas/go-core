@@ -65,7 +65,7 @@ func (t Time) BeginOfDay() Time {
 func (t Time) EndOfDay() Time {
 	tt := t.AsTime()
 	year, month, day := t.AsTime().Date()
-	return (Time)(time.Date(year, month, day, 0, 0, 0, 0, tt.Location()))
+	return (Time)(time.Date(year, month, day, 23, 59, 59, 0, tt.Location()))
 }
 
 // Tomorrow returns t shifted to tomorrow
