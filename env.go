@@ -20,7 +20,7 @@ func GetEnvAsString(name, fallback string) string {
 // or of the fallback if it is not present
 func GetEnvAsBool(name string, fallback bool) bool {
 	if value, ok := os.LookupEnv(name); ok && len(value) > 0 {
-		return strings.Contains(strings.ToLower(value), "1onyestrue")
+		return strings.Contains("1onyestrue", strings.ToLower(value))
 	}
 	return fallback
 }
