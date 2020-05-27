@@ -1,6 +1,8 @@
 package core
 
 import (
+	"errors"
+	"net/url"
 	"os"
 	"strconv"
 	"strings"
@@ -8,7 +10,8 @@ import (
 )
 
 // GetEnvAsString returns the string value of an environment variable by its name
-// or of the fallback if it is not present
+// 
+// if not present, the fallback value is used
 func GetEnvAsString(name, fallback string) string {
 	if value, ok := os.LookupEnv(name); ok && len(value) > 0 {
 		return value
@@ -17,7 +20,8 @@ func GetEnvAsString(name, fallback string) string {
 }
 
 // GetEnvAsBool returns the bool value of an environment variable by its name
-// or of the fallback if it is not present
+// 
+// if not present, the fallback value is used
 func GetEnvAsBool(name string, fallback bool) bool {
 	if value, ok := os.LookupEnv(name); ok && len(value) > 0 {
 		return strings.Contains("1onyestrue", strings.ToLower(value))
@@ -26,7 +30,8 @@ func GetEnvAsBool(name string, fallback bool) bool {
 }
 
 // GetEnvAsInt returns the int value of an environment variable by its name
-// or of the fallback if it is not present
+// 
+// if not present, the fallback value is used
 func GetEnvAsInt(name string, fallback int) int {
 	if value, ok := os.LookupEnv(name); ok {
 		if intvalue, err := strconv.Atoi(value); err == nil {
@@ -37,7 +42,8 @@ func GetEnvAsInt(name string, fallback int) int {
 }
 
 // GetEnvAsTime returns the time value of an environment variable by its name
-// or of the fallback if it is not present
+// 
+// if not present, the fallback value is used
 func GetEnvAsTime(name string, fallback time.Time) time.Time {
 	if value, ok := os.LookupEnv(name); ok {
 		if timevalue, err := time.Parse(time.RFC3339, value); err == nil {
@@ -48,7 +54,8 @@ func GetEnvAsTime(name string, fallback time.Time) time.Time {
 }
 
 // GetEnvAsDuration returns the time value of an environment variable by its name
-// or of the fallback if it is not present
+// 
+// if not present, the fallback value is used
 func GetEnvAsDuration(name string, fallback time.Duration) time.Duration {
 	if value, ok := os.LookupEnv(name); ok {
 		if duration, err := ParseDuration(value); err == nil {
@@ -56,4 +63,27 @@ func GetEnvAsDuration(name string, fallback time.Duration) time.Duration {
 		}
 	}
 	return fallback
+}
+
+// GetEnvAsURL returns the URL value of an environment variable by its name
+// 
+// if not present, the fallback value is used
+func GetEnvAsURL(name string, fallback interface {}) *url.URL {
+	if value, ok := os.LookupEnv(name); ok {
+		if address, err := url.Parse(value); err == nil {
+			return address
+		}
+	}
+	if address, ok := fallback.(*url.URL); ok {
+		return address
+	}
+	if address, ok := fallback.(url.URL); ok {
+		return &address
+	}
+	if value, ok := fallback.(string); ok {
+		if address, err := url.Parse(value); err == nil {
+			return address
+		}
+	}
+	panic(errors.New("Invalid fallback type in core.GetEnvAsURL"))
 }
