@@ -33,7 +33,7 @@ func GetEnvAsBool(name string, fallback bool) bool {
 // 
 // if not present, the fallback value is used
 func GetEnvAsInt(name string, fallback int) int {
-	if value, ok := os.LookupEnv(name); ok {
+	if value, ok := os.LookupEnv(name); ok && len(value) > 0 {
 		if intvalue, err := strconv.Atoi(value); err == nil {
 			return intvalue
 		}
@@ -45,7 +45,7 @@ func GetEnvAsInt(name string, fallback int) int {
 // 
 // if not present, the fallback value is used
 func GetEnvAsTime(name string, fallback time.Time) time.Time {
-	if value, ok := os.LookupEnv(name); ok {
+	if value, ok := os.LookupEnv(name); ok && len(value) > 0 {
 		if timevalue, err := time.Parse(time.RFC3339, value); err == nil {
 			return timevalue
 		}
@@ -57,7 +57,7 @@ func GetEnvAsTime(name string, fallback time.Time) time.Time {
 // 
 // if not present, the fallback value is used
 func GetEnvAsDuration(name string, fallback time.Duration) time.Duration {
-	if value, ok := os.LookupEnv(name); ok {
+	if value, ok := os.LookupEnv(name); ok && len(value) > 0 {
 		if duration, err := ParseDuration(value); err == nil {
 			return duration
 		}
@@ -69,7 +69,7 @@ func GetEnvAsDuration(name string, fallback time.Duration) time.Duration {
 // 
 // if not present, the fallback value is used
 func GetEnvAsURL(name string, fallback interface {}) *url.URL {
-	if value, ok := os.LookupEnv(name); ok {
+	if value, ok := os.LookupEnv(name); ok && len(value) > 0 {
 		if address, err := url.Parse(value); err == nil {
 			return address
 		}
