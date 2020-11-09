@@ -1,4 +1,4 @@
-package line
+package core
 
 import (
 	"reflect"
@@ -8,7 +8,7 @@ import (
 type TypeRegistry map[string]reflect.Type
 
 // Add adds one or more TypeCarriers to the TypeRegistry
-func (registry TypeRegistry) Add(classes ...core.TypeCarrier) TypeRegistry {
+func (registry TypeRegistry) Add(classes ...TypeCarrier) TypeRegistry {
 	for _, class := range classes {
 		registry[class.GetType()] = reflect.TypeOf(class)
 	}
