@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/gildas/go-core"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -119,4 +120,23 @@ func TestPanicGetEnvAsURLWithInvalidFallback(t *testing.T) {
 		}
 	}()
 	_ = core.GetEnvAsURL("NOT_HERE", 1234)
+}
+
+func TestCanGetEnvAsUUID(t *testing.T) {
+	expected := uuid.New()
+	os.Setenv("TEST", expected.String())
+	os.Setenv("WRONG", "not a UUID")
+	defer func() {
+		os.Unsetenv("TEST")
+		os.Unsetenv("WRONG")
+	}()
+
+	value := core.GetEnvAsUUID("TEST", uuid.New())
+	assert.Equal(t, expected, value)
+
+	value = core.GetEnvAsUUID("NOT_HERE", expected)
+	assert.Equal(t, expected, value)
+
+	value = core.GetEnvAsUUID("WRONG", expected)
+	assert.Equal(t, expected, value)
 }

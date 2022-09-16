@@ -7,6 +7,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 // GetEnvAsString returns the string value of an environment variable by its name
@@ -86,4 +88,13 @@ func GetEnvAsURL(name string, fallback interface {}) *url.URL {
 		}
 	}
 	panic(errors.New("Invalid fallback type in core.GetEnvAsURL"))
+}
+
+func GetEnvAsUUID(name string, fallback uuid.UUID) uuid.UUID {
+	if value, ok := os.LookupEnv(name); ok && len(value) > 0 {
+		if uuid, err := uuid.Parse(value); err == nil {
+			return uuid
+		}
+	}
+	return fallback
 }
