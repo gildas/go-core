@@ -73,7 +73,7 @@ func TestCanGetEnvAsTime(t *testing.T) {
 		os.Unsetenv("TEST")
 	}()
 
-	value := core.GetEnvAsTime("TEST", now.Add(24 * time.Hour))
+	value := core.GetEnvAsTime("TEST", now.Add(24*time.Hour))
 	assert.Equal(t, now.Format(time.RFC3339), value.Format(time.RFC3339))
 
 	value = core.GetEnvAsTime("NOT_HERE", now)
@@ -86,11 +86,11 @@ func TestCanGetEnvAsDuration(t *testing.T) {
 		os.Unsetenv("TEST")
 	}()
 
-	value := core.GetEnvAsDuration("TEST", 100 * time.Second)
-	assert.Equal(t, 12 * time.Second, value)
+	value := core.GetEnvAsDuration("TEST", 100*time.Second)
+	assert.Equal(t, 12*time.Second, value)
 
-	value = core.GetEnvAsDuration("NOT_HERE", 100 * time.Second)
-	assert.Equal(t, 100 * time.Second, value)
+	value = core.GetEnvAsDuration("NOT_HERE", 100*time.Second)
+	assert.Equal(t, 100*time.Second, value)
 }
 
 func TestCanGetEnvAsURL(t *testing.T) {

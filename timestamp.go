@@ -6,7 +6,6 @@ import (
 	"time"
 )
 
-
 // Timestamp converts Unix Epoch to/from time.Time
 type Timestamp time.Time
 
@@ -17,7 +16,7 @@ func TimestampNow() Timestamp {
 
 // TimestampFromJSEpoch returns a Timestamp from a JS Epoch
 func TimestampFromJSEpoch(epoch int64) Timestamp {
-	return Timestamp(time.Unix(epoch / 1000, (epoch % 1000) * 1000000))
+	return Timestamp(time.Unix(epoch/1000, (epoch%1000)*1000000))
 }
 
 // MarshalJSON encodes a TimeStamp to its JSON Epoch
@@ -33,10 +32,12 @@ func (t Timestamp) MarshalJSON() ([]byte, error) {
 //   The Epoch can be "12345" or 12345
 func (t *Timestamp) UnmarshalJSON(payload []byte) (err error) {
 	// First get rid of the surrounding double quotes
-	unquoted   := strings.Replace(string(payload), `"`, ``, -1)
+	unquoted := strings.Replace(string(payload), `"`, ``, -1)
 	value, err := strconv.ParseInt(unquoted, 10, 64)
 
-	if err != nil { return err }
+	if err != nil {
+		return err
+	}
 	// Per Node.js epochs, value will be in milliseconds
 	*t = TimestampFromJSEpoch(value)
 	return

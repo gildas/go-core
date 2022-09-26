@@ -5,4 +5,3 @@ type GoString interface {
 	// GoString returns a GO representation of this
 	GoString() string
 }
-

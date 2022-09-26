@@ -2,8 +2,8 @@ package core_test
 
 import (
 	"encoding/json"
-	"testing"
 	"net/url"
+	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

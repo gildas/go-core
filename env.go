@@ -12,7 +12,7 @@ import (
 )
 
 // GetEnvAsString returns the string value of an environment variable by its name
-// 
+//
 // if not present, the fallback value is used
 func GetEnvAsString(name, fallback string) string {
 	if value, ok := os.LookupEnv(name); ok && len(value) > 0 {
@@ -22,7 +22,7 @@ func GetEnvAsString(name, fallback string) string {
 }
 
 // GetEnvAsBool returns the bool value of an environment variable by its name
-// 
+//
 // if not present, the fallback value is used
 func GetEnvAsBool(name string, fallback bool) bool {
 	if value, ok := os.LookupEnv(name); ok && len(value) > 0 {
@@ -32,7 +32,7 @@ func GetEnvAsBool(name string, fallback bool) bool {
 }
 
 // GetEnvAsInt returns the int value of an environment variable by its name
-// 
+//
 // if not present, the fallback value is used
 func GetEnvAsInt(name string, fallback int) int {
 	if value, ok := os.LookupEnv(name); ok && len(value) > 0 {
@@ -44,7 +44,7 @@ func GetEnvAsInt(name string, fallback int) int {
 }
 
 // GetEnvAsTime returns the time value of an environment variable by its name
-// 
+//
 // if not present, the fallback value is used
 func GetEnvAsTime(name string, fallback time.Time) time.Time {
 	if value, ok := os.LookupEnv(name); ok && len(value) > 0 {
@@ -56,7 +56,7 @@ func GetEnvAsTime(name string, fallback time.Time) time.Time {
 }
 
 // GetEnvAsDuration returns the time value of an environment variable by its name
-// 
+//
 // if not present, the fallback value is used
 func GetEnvAsDuration(name string, fallback time.Duration) time.Duration {
 	if value, ok := os.LookupEnv(name); ok && len(value) > 0 {
@@ -68,9 +68,9 @@ func GetEnvAsDuration(name string, fallback time.Duration) time.Duration {
 }
 
 // GetEnvAsURL returns the URL value of an environment variable by its name
-// 
+//
 // if not present, the fallback value is used
-func GetEnvAsURL(name string, fallback interface {}) *url.URL {
+func GetEnvAsURL(name string, fallback interface{}) *url.URL {
 	if value, ok := os.LookupEnv(name); ok && len(value) > 0 {
 		if address, err := url.Parse(value); err == nil {
 			return address

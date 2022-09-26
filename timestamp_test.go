@@ -5,15 +5,14 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	. "github.com/gildas/go-core"
+	"github.com/stretchr/testify/assert"
 )
 
-
 func TestTimestampIntUnmarshal(t *testing.T) {
-	epoch   := int64(1534318964318)
+	epoch := int64(1534318964318)
 	payload := fmt.Sprintf(`{"timestamp":%d}`, epoch)
-	result  := &struct {
+	result := &struct {
 		Timestamp Timestamp `json:"timestamp"`
 	}{}
 	err := json.Unmarshal([]byte(payload), &result)
@@ -23,9 +22,9 @@ func TestTimestampIntUnmarshal(t *testing.T) {
 }
 
 func TestTimestampStringUnmarshal(t *testing.T) {
-	epoch   := int64(1534318964318)
+	epoch := int64(1534318964318)
 	payload := fmt.Sprintf(`{"timestamp":"%d"}`, epoch)
-	result  := &struct {
+	result := &struct {
 		Timestamp Timestamp `json:"timestamp"`
 	}{}
 	err := json.Unmarshal([]byte(payload), &result)

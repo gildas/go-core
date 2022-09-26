@@ -1,6 +1,6 @@
 package core
 
-// Must panics if there is an error, otherwise returns the given value 
+// Must panics if there is an error, otherwise returns the given value
 //
 // Example:
 //  var myurl = core.Must[*url.URL](url.Parse("https://www.acme.com"))

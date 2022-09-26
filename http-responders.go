@@ -11,7 +11,7 @@ import (
 func RespondWithError(w http.ResponseWriter, code int, err error) {
 	props := map[string]string{
 		"http_status": strconv.Itoa(code),
-		"error": err.Error(),
+		"error":       err.Error(),
 	}
 
 	var field reflect.Value
@@ -21,7 +21,7 @@ func RespondWithError(w http.ResponseWriter, code int, err error) {
 	if errValue.Type().Kind() == reflect.Ptr {
 		errValue = errValue.Elem()
 	}
-	
+
 	field = errValue.FieldByName("ID")
 	if field.IsValid() && field.Type().Kind().String() == "string" && field.Len() > 0 {
 		props["id"] = field.String()

@@ -13,8 +13,8 @@ import (
 // the func is executed once before the ticker starts
 func ExecEvery(job func(tick int64, at time.Time, changeme chan time.Duration), every time.Duration) (chan bool, chan bool, chan time.Duration) {
 	changeme := make(chan time.Duration)
-	pingme   := make(chan bool)
-	stopme   := make(chan bool)
+	pingme := make(chan bool)
+	stopme := make(chan bool)
 
 	go func() {
 		tick := int64(0)
@@ -23,16 +23,16 @@ func ExecEvery(job func(tick int64, at time.Time, changeme chan time.Duration), 
 		for {
 			select {
 			case newtick := <-changeme:
-				if newtick > 0 * time.Second {
+				if newtick > 0*time.Second {
 					ticker.Stop()
 					ticker = time.NewTicker(newtick)
 				}
-			case <- pingme:
+			case <-pingme:
 				go job(tick, time.Now(), changeme)
-			case now := <- ticker.C:
+			case now := <-ticker.C:
 				tick++
 				go job(tick, now, changeme)
-			case <- stopme:
+			case <-stopme:
 				ticker.Stop()
 				return
 			}
