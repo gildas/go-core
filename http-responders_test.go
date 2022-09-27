@@ -3,11 +3,11 @@ package core_test
 import (
 	"encoding/json"
 	"fmt"
+	"html/template"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"html/template"
 
 	"github.com/gildas/go-core"
 	"github.com/google/uuid"

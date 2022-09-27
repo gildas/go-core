@@ -73,27 +73,27 @@ func ParseDuration(value string) (duration time.Duration, err error) {
 	}
 	if len(matches[1]) > 0 {
 		parsed, _ = strconv.Atoi(matches[1][:len(matches[1])-1]) // remove the Y
-		duration = time.Duration(parsed*24*365) * time.Hour // years
+		duration = time.Duration(parsed*24*365) * time.Hour      // years
 	}
 	if len(matches[2]) > 0 {
 		parsed, _ = strconv.Atoi(matches[2][:len(matches[2])-1]) // remove the M
-		duration += time.Duration(parsed*24*30) * time.Hour // months
+		duration += time.Duration(parsed*24*30) * time.Hour      // months
 	}
 	if len(matches[3]) > 0 {
 		parsed, _ = strconv.Atoi(matches[3][:len(matches[3])-1]) // remove the W
-		duration += time.Duration(parsed*24*7) * time.Hour // weeks
+		duration += time.Duration(parsed*24*7) * time.Hour       // weeks
 	}
 	if len(matches[4]) > 0 {
 		parsed, _ = strconv.Atoi(matches[4][:len(matches[4])-1]) // remove the D
-		duration += time.Duration(parsed*24) * time.Hour // days
+		duration += time.Duration(parsed*24) * time.Hour         // days
 	}
 	if len(matches[5]) > 0 {
 		parsed, _ = strconv.Atoi(matches[5][:len(matches[5])-1]) // remove the H
-		duration += time.Duration(parsed) * time.Hour // hours
+		duration += time.Duration(parsed) * time.Hour            // hours
 	}
 	if len(matches[6]) > 0 {
 		parsed, _ = strconv.Atoi(matches[6][:len(matches[6])-1]) // remove the M
-		duration += time.Duration(parsed) * time.Minute // minutes
+		duration += time.Duration(parsed) * time.Minute          // minutes
 	}
 	if len(matches[7]) > 0 {
 		fraction, _ := strconv.ParseFloat(matches[7][:len(matches[7])-1], 64) // remove the S
