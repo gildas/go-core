@@ -34,6 +34,11 @@ func Date(year int, month time.Month, day, hour, min, sec, nsec int, loc *time.L
 	return (Time)(time.Date(year, month, day, hour, min, sec, nsec, loc))
 }
 
+// DateUTC returns a new Date
+func DateUTC(year int, month time.Month, day, hour, min, sec, nsec int) Time {
+	return (Time)(time.Date(year, month, day, hour, min, sec, nsec, time.UTC))
+}
+
 // Date returns the year, month, and day in which t occurs
 func (t Time) Date() (year int, month time.Month, day int) {
 	return t.AsTime().Date()
