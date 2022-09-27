@@ -5,12 +5,12 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 type TestError struct {
-	ID string
+	ID    string
 	Value interface{}
 }
 
@@ -25,7 +25,7 @@ func TestCanExtractFieldsFromError(t *testing.T) {
 	errValue := reflect.ValueOf(err)
 	require.NotNil(t, errValue)
 	t.Logf("ErrValue: %#v", errValue)
-	
+
 	field = errValue.FieldByName("ID")
 	require.True(t, field.IsValid(), "Field ID is not valid")
 	require.True(t, field.Type().Kind().String() == "string", "Field ID is not a string, it is a %s", field.Type().Kind().String())
@@ -46,7 +46,7 @@ func TestCanReceivePtrToError(t *testing.T) {
 	assert.True(t, errValue.Type().Kind() == reflect.Ptr, "Error is not a Pointer (%s)", errValue.Type().Kind().String())
 
 	errValue = errValue.Elem()
-	
+
 	field = errValue.FieldByName("ID")
 	require.False(t, field.IsValid(), "Field ID is valid")
 }

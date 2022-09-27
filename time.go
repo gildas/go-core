@@ -34,6 +34,11 @@ func Date(year int, month time.Month, day, hour, min, sec, nsec int, loc *time.L
 	return (Time)(time.Date(year, month, day, hour, min, sec, nsec, loc))
 }
 
+// DateUTC returns a new Date
+func DateUTC(year int, month time.Month, day, hour, min, sec, nsec int) Time {
+	return (Time)(time.Date(year, month, day, hour, min, sec, nsec, time.UTC))
+}
+
 // Date returns the year, month, and day in which t occurs
 func (t Time) Date() (year int, month time.Month, day int) {
 	return t.AsTime().Date()
@@ -70,12 +75,12 @@ func (t Time) EndOfDay() Time {
 
 // Tomorrow returns t shifted to tomorrow
 func (t Time) Tomorrow() Time {
-	return (Time)(t.AsTime().Add(24 *time.Hour))
+	return (Time)(t.AsTime().Add(24 * time.Hour))
 }
 
 // Yesterday returns t shifted to yesterday
 func (t Time) Yesterday() Time {
-	return (Time)(t.AsTime().Add(-24 *time.Hour))
+	return (Time)(t.AsTime().Add(-24 * time.Hour))
 }
 
 // After reports whether the time instant t is after u

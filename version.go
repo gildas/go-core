@@ -1,4 +1,4 @@
 package core
 
 // VERSION is the version of this application
-var VERSION = "0.4.10"
+var VERSION = "0.5.0"

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/gildas/go-core"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -72,7 +73,7 @@ func TestCanGetEnvAsTime(t *testing.T) {
 		os.Unsetenv("TEST")
 	}()
 
-	value := core.GetEnvAsTime("TEST", now.Add(24 * time.Hour))
+	value := core.GetEnvAsTime("TEST", now.Add(24*time.Hour))
 	assert.Equal(t, now.Format(time.RFC3339), value.Format(time.RFC3339))
 
 	value = core.GetEnvAsTime("NOT_HERE", now)
@@ -85,11 +86,11 @@ func TestCanGetEnvAsDuration(t *testing.T) {
 		os.Unsetenv("TEST")
 	}()
 
-	value := core.GetEnvAsDuration("TEST", 100 * time.Second)
-	assert.Equal(t, 12 * time.Second, value)
+	value := core.GetEnvAsDuration("TEST", 100*time.Second)
+	assert.Equal(t, 12*time.Second, value)
 
-	value = core.GetEnvAsDuration("NOT_HERE", 100 * time.Second)
-	assert.Equal(t, 100 * time.Second, value)
+	value = core.GetEnvAsDuration("NOT_HERE", 100*time.Second)
+	assert.Equal(t, 100*time.Second, value)
 }
 
 func TestCanGetEnvAsURL(t *testing.T) {
@@ -119,4 +120,23 @@ func TestPanicGetEnvAsURLWithInvalidFallback(t *testing.T) {
 		}
 	}()
 	_ = core.GetEnvAsURL("NOT_HERE", 1234)
+}
+
+func TestCanGetEnvAsUUID(t *testing.T) {
+	expected := uuid.New()
+	os.Setenv("TEST", expected.String())
+	os.Setenv("WRONG", "not a UUID")
+	defer func() {
+		os.Unsetenv("TEST")
+		os.Unsetenv("WRONG")
+	}()
+
+	value := core.GetEnvAsUUID("TEST", uuid.New())
+	assert.Equal(t, expected, value)
+
+	value = core.GetEnvAsUUID("NOT_HERE", expected)
+	assert.Equal(t, expected, value)
+
+	value = core.GetEnvAsUUID("WRONG", expected)
+	assert.Equal(t, expected, value)
 }

@@ -3,9 +3,9 @@ package core_test
 import (
 	"testing"
 
+	. "github.com/gildas/go-core"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
-	. "github.com/gildas/go-core"
 )
 
 func TestCanEncodeUUID(t *testing.T) {

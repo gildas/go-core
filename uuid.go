@@ -22,7 +22,7 @@ func EncodeUUID(uuid uuid.UUID) string {
 // DecodeUUID decodes a UUID from a 22 char long string
 func DecodeUUID(encoded string) (uuid.UUID, error) {
 	bytes := make([]byte, 16)
-	binary.BigEndian.PutUint64(bytes,     decodeUInt64(encoded[:11]))
+	binary.BigEndian.PutUint64(bytes, decodeUInt64(encoded[:11]))
 	binary.BigEndian.PutUint64(bytes[8:], decodeUInt64(encoded[11:]))
 	return uuid.FromBytes(bytes)
 }
@@ -31,7 +31,7 @@ func encodeUInt64(number uint64) string {
 	base := "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
 	result := ""
 	for i := 0; i < 11; i++ {
-		result = string(base[number & 0x3f]) + result
+		result = string(base[number&0x3f]) + result
 		number = number >> 6
 	}
 	return result

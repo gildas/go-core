@@ -28,7 +28,7 @@ func (registry TypeRegistry) Add(classes ...TypeCarrier) TypeRegistry {
 // Examples:
 //   object, err := registry.UnmarshalJSON(payload)
 //   object, err := registry.UnmarshalJSON(payload, "__type", "Type")
-func (registry TypeRegistry) UnmarshalJSON(payload []byte, typetag... string) (interface{}, error) {
+func (registry TypeRegistry) UnmarshalJSON(payload []byte, typetag ...string) (interface{}, error) {
 	if len(typetag) == 0 {
 		typetag = []string{"type"}
 	}
