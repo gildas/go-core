@@ -7,6 +7,8 @@ import (
 	"github.com/google/uuid"
 )
 
+type UUID uuid.UUID
+
 // EncodeUUID encodes a UUID in a 22 char long string
 func EncodeUUID(uuid uuid.UUID) string {
 	bytes, _ := uuid.MarshalBinary()
@@ -45,4 +47,48 @@ func decodeUInt64(compressed string) uint64 {
 		result = (result << 6) | uint64(index)
 	}
 	return result
+}
+
+// IsZero returns true if the UUID is uuid.Nil
+func (id UUID) IsZero() bool {
+	return uuid.UUID(id) == uuid.Nil
+}
+
+// String returns the UUID as a string
+//
+// If the UUID is uuid.Nil, an empty string is returned.
+//
+// Implements the fmt.Stringer interface
+func (id UUID) String() string {
+	if id.IsZero() {
+		return ""
+	}
+	return uuid.UUID(id).String()
+}
+
+// MarshalText marshals the UUID as a string
+//
+// Implements the json.Marshaler interface
+func (id UUID) MarshalText() ([]byte, error) {
+	if id.IsZero() {
+		return nil, nil
+	}
+	return []byte(uuid.UUID(id).String()), nil
+}
+
+// UnmarshalText unmarshals the UUID from a string
+//
+// If the string is empty or null, the UUID is set to uuid.Nil.
+//
+// Implements the json.Unmarshaler interface
+func (id *UUID) UnmarshalText(payload []byte) (err error) {
+	if len(payload) == 0 || string(payload) == `""` || string(payload) == `null` {
+		*id = UUID(uuid.Nil)
+		return nil
+	}
+	parsed, err := uuid.Parse(string(payload))
+	if err == nil {
+		*id = UUID(parsed)
+	}
+	return err
 }
