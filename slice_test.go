@@ -1,11 +1,21 @@
 package core_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/gildas/go-core"
 	"github.com/stretchr/testify/assert"
 )
+
+type SomethingMore interface {
+	Something
+	fmt.Stringer
+}
+
+func (something Something2) String() string {
+	return something.Data
+}
 
 func TestSliceCanBeFiltered(t *testing.T) {
 	items := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
@@ -45,4 +55,78 @@ func TestSliceCanBeSorted(t *testing.T) {
 		return a < b
 	})
 	assert.Equal(t, expected, items)
+}
+
+func TestSliceCanContains(t *testing.T) {
+	items := []int{1, 2, 3, 4, 5}
+
+	assert.True(t, core.Contains(items, 1))
+	assert.False(t, core.Contains(items, 6))
+}
+
+func TestSliceCanContainsWithFunc(t *testing.T) {
+	items := []Something1{{"1"}, {"2"}, {"3"}, {"4"}, {"5"}}
+
+	assert.True(t, core.ContainsWithFunc(items, Something1{"1"}, func(a, b Something1) bool { return a.Data == b.Data }))
+	assert.False(t, core.ContainsWithFunc(items, Something1{"6"}, func(a, b Something1) bool { return a.Data == b.Data }))
+}
+
+func TestSliceCanBeCompared(t *testing.T) {
+	expected := []int{1, 2, 3, 4, 5}
+
+	items := []int{1, 2, 3, 4, 5}
+	assert.True(t, core.EqualSlices(items, expected))
+
+	items = []int{1, 3, 2, 4, 5}
+	assert.True(t, core.EqualSlices(items, expected))
+
+	items = []int{1, 2, 3, 4, 5, 6}
+	assert.False(t, core.EqualSlices(items, expected))
+
+	items = []int{1, 2, 2, 4, 5}
+	assert.False(t, core.EqualSlices(items, expected))
+
+	items = []int{1, 2, 3, 4, 6}
+	assert.False(t, core.EqualSlices(items, expected))
+}
+
+func TestSliceCanBeComparedWithFunc(t *testing.T) {
+	expected := []Something{Something1{"1"}, Something1{"2"}, Something1{"3"}, Something1{"4"}, Something1{"5"}}
+
+	items := []Something{Something1{"1"}, Something1{"2"}, Something1{"3"}, Something1{"4"}, Something1{"5"}}
+	assert.True(t, core.EqualSlicesWithFunc(items, expected, func(a, b Something) bool { return a.GetData() == b.GetData() }))
+
+	items = []Something{Something1{"1"}, Something1{"3"}, Something1{"2"}, Something1{"4"}, Something1{"5"}}
+	assert.True(t, core.EqualSlicesWithFunc(items, expected, func(a, b Something) bool { return a.GetData() == b.GetData() }))
+
+	items = []Something{Something1{"1"}, Something1{"2"}, Something1{"3"}, Something1{"4"}, Something1{"5"}, Something1{"6"}}
+	assert.False(t, core.EqualSlicesWithFunc(items, expected, func(a, b Something) bool { return a.GetData() == b.GetData() }))
+
+	items = []Something{Something1{"1"}, Something1{"2"}, Something1{"2"}, Something1{"4"}, Something1{"5"}}
+	assert.False(t, core.EqualSlicesWithFunc(items, expected, func(a, b Something) bool { return a.GetData() == b.GetData() }))
+
+	items = []Something{Something1{"1"}, Something1{"2"}, Something1{"3"}, Something1{"4"}, Something1{"6"}}
+	assert.False(t, core.EqualSlicesWithFunc(items, expected, func(a, b Something) bool { return a.GetData() == b.GetData() }))
+}
+
+func TestSliceCanJoin(t *testing.T) {
+	items := []Something2{{"1"}, {"2"}, {"3"}, {"4"}, {"5"}}
+	assert.Equal(t, "1, 2, 3, 4, 5", core.Join(items, ", "))
+
+	items = []Something2{{"1"}}
+	assert.Equal(t, "1", core.Join(items, ", "))
+
+	items = []Something2{}
+	assert.Equal(t, "", core.Join(items, ", "))
+}
+
+func TestSliceCanJoinWithFunc(t *testing.T) {
+	items := []Something1{{"1"}, {"2"}, {"3"}, {"4"}, {"5"}}
+	assert.Equal(t, "1, 2, 3, 4, 5", core.JoinWithFunc(items, ", ", func(item Something1) string { return item.Data }))
+
+	items = []Something1{{"1"}}
+	assert.Equal(t, "1", core.JoinWithFunc(items, ", ", func(item Something1) string { return item.Data }))
+
+	items = []Something1{}
+	assert.Equal(t, "", core.JoinWithFunc(items, ", ", func(item Something1) string { return item.Data }))
 }

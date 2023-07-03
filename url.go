@@ -14,14 +14,16 @@ func (u URL) AsURL() url.URL {
 }
 
 // MarshalJSON marshals this into JSON
-//   implements json.Marshaler interface
+//
+//	implements json.Marshaler interface
 func (u URL) MarshalJSON() ([]byte, error) {
 	uu := url.URL(u)
 	return json.Marshal((&uu).String())
 }
 
 // UnmarshalJSON decodes JSON
-//   implements json.Unmarshaler interface
+//
+//	implements json.Unmarshaler interface
 func (u *URL) UnmarshalJSON(payload []byte) (err error) {
 	var inner string
 	if err = json.Unmarshal(payload, &inner); err != nil {

@@ -26,8 +26,9 @@ func (registry TypeRegistry) Add(classes ...TypeCarrier) TypeRegistry {
 // The default typetag is "type", but you can replace it by one or more of your own.
 //
 // Examples:
-//   object, err := registry.UnmarshalJSON(payload)
-//   object, err := registry.UnmarshalJSON(payload, "__type", "Type")
+//
+//	object, err := registry.UnmarshalJSON(payload)
+//	object, err := registry.UnmarshalJSON(payload, "__type", "Type")
 func (registry TypeRegistry) UnmarshalJSON(payload []byte, typetag ...string) (interface{}, error) {
 	if len(typetag) == 0 {
 		typetag = []string{"type"}

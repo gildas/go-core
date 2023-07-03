@@ -142,7 +142,7 @@ func ParseTimeIn(value string, loc *time.Location) (Time, error) {
 // Format returns a textual representation of the time value formatted according to layout,
 // which defines the format by showing how the reference time, defined to be
 //
-//    Mon Jan 2 15:04:05 -0700 MST 2006
+//	Mon Jan 2 15:04:05 -0700 MST 2006
 //
 // would be displayed if it were the value; it serves as an example of the desired output.
 // The same display rules will then be applied to the time value.
@@ -159,7 +159,7 @@ func (t Time) Format(layout string) string {
 
 // String returns the time formatted using the format string
 //
-//    "2006-01-02 15:04:05.999999999 -0700 MST"
+//	"2006-01-02 15:04:05.999999999 -0700 MST"
 //
 // If the time has a monotonic clock reading, the returned string includes a final field "m=±<value>",
 // where value is the monotonic clock reading formatted as a decimal number of seconds.
@@ -171,17 +171,19 @@ func (t Time) String() string {
 }
 
 // MarshalJSON marshals this into JSON
-//   implements json.Marshaler interface
 //
-//   We store time as RFC3339 UTC
+//	implements json.Marshaler interface
+//
+//	We store time as RFC3339 UTC
 func (t Time) MarshalJSON() ([]byte, error) {
 	return json.Marshal(time.Time(t).UTC().Format(time.RFC3339))
 }
 
 // UnmarshalJSON decodes JSON
-//   implements json.Unmarshaler interface
 //
-//   We read time as RFC3339 UTC
+//	implements json.Unmarshaler interface
+//
+//	We read time as RFC3339 UTC
 func (t *Time) UnmarshalJSON(payload []byte) (err error) {
 	var inner string
 	if err = json.Unmarshal(payload, &inner); err != nil {

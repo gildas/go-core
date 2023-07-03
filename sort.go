@@ -5,10 +5,11 @@ package core
 // Note: The items slice is modified in place.
 //
 // Example:
-// 	// Sort a slice of numbers
-// 	Sort(numbers, func(a, b int) bool {
-// 		return a < b
-// 	})
+//
+//	// Sort a slice of numbers
+//	Sort(numbers, func(a, b int) bool {
+//		return a < b
+//	})
 func Sort[T any](items []T, sorter func(T, T) bool) {
 	index := partition(items, len(items)/2, sorter)
 	if index > 1 {

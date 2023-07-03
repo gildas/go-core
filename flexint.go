@@ -24,7 +24,8 @@ type FlexInt32 int32
 type FlexInt64 int64
 
 // UnmarshalJSON decodes JSON
-//   implements json.Unmarshaler interface
+//
+//	implements json.Unmarshaler interface
 func (i *FlexInt) UnmarshalJSON(payload []byte) error {
 	// First get rid of the surrounding double quotes
 	unquoted := strings.Replace(string(payload), `"`, ``, -1)
@@ -37,7 +38,8 @@ func (i *FlexInt) UnmarshalJSON(payload []byte) error {
 }
 
 // UnmarshalJSON decodes JSON
-//   implements json.Unmarshaler interface
+//
+//	implements json.Unmarshaler interface
 func (i *FlexInt8) UnmarshalJSON(payload []byte) error {
 	// First get rid of the surrounding double quotes
 	unquoted := strings.Replace(string(payload), `"`, ``, -1)
@@ -50,7 +52,8 @@ func (i *FlexInt8) UnmarshalJSON(payload []byte) error {
 }
 
 // UnmarshalJSON decodes JSON
-//   implements json.Unmarshaler interface
+//
+//	implements json.Unmarshaler interface
 func (i *FlexInt16) UnmarshalJSON(payload []byte) error {
 	// First get rid of the surrounding double quotes
 	unquoted := strings.Replace(string(payload), `"`, ``, -1)
@@ -63,7 +66,8 @@ func (i *FlexInt16) UnmarshalJSON(payload []byte) error {
 }
 
 // UnmarshalJSON decodes JSON
-//   implements json.Unmarshaler interface
+//
+//	implements json.Unmarshaler interface
 func (i *FlexInt32) UnmarshalJSON(payload []byte) error {
 	// First get rid of the surrounding double quotes
 	unquoted := strings.Replace(string(payload), `"`, ``, -1)
@@ -76,7 +80,8 @@ func (i *FlexInt32) UnmarshalJSON(payload []byte) error {
 }
 
 // UnmarshalJSON decodes JSON
-//   implements json.Unmarshaler interface
+//
+//	implements json.Unmarshaler interface
 func (i *FlexInt64) UnmarshalJSON(payload []byte) error {
 	// First get rid of the surrounding double quotes
 	unquoted := strings.Replace(string(payload), `"`, ``, -1)

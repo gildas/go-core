@@ -14,7 +14,7 @@ type Duration time.Duration
 
 // MarshalJSON marshals this into JSON
 //
-// The duration is serialized in milliseconds
+// # The duration is serialized in milliseconds
 //
 // implements json.Marshaler interface
 func (duration Duration) MarshalJSON() ([]byte, error) {
@@ -22,10 +22,11 @@ func (duration Duration) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON decodes JSON
-//   implements json.Unmarshaler interface
 //
-//   an int (int64) will be assumed to be milli-seconds
-//   a string will be parsed as an ISO 8601 then as a GO time.Duration
+//	implements json.Unmarshaler interface
+//
+//	an int (int64) will be assumed to be milli-seconds
+//	a string will be parsed as an ISO 8601 then as a GO time.Duration
 func (duration *Duration) UnmarshalJSON(payload []byte) (err error) {
 	var inner interface{}
 	_ = json.Unmarshal(payload, &inner)
@@ -52,7 +53,8 @@ func (duration *Duration) UnmarshalJSON(payload []byte) (err error) {
 }
 
 // ParseDuration parses an ISO8601 duration
-//   If the given value is not an ISO8601 duration, returns time.ParseDuration
+//
+//	If the given value is not an ISO8601 duration, returns time.ParseDuration
 func ParseDuration(value string) (duration time.Duration, err error) {
 	parser := regexp.MustCompile(`P(?P<years>\d+Y)?(?P<months>\d+M)?(?P<weeks>\d+W)?(?P<days>\d+D)?T?(?P<hours>\d+H)?(?P<minutes>\d+M)?(?P<seconds>\d+(?:\.\d+)?S)?`)
 	matches := parser.FindStringSubmatch(value)
