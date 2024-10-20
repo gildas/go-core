@@ -17,6 +17,17 @@ func (something Something2) String() string {
 	return something.Data
 }
 
+func TestSliceCanFindValue(t *testing.T) {
+	items := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+
+	result, found := core.Find(items, 5)
+	assert.True(t, found)
+	assert.Equal(t, 5, result)
+
+	_, found = core.Find(items, 11)
+	assert.False(t, found)
+}
+
 func TestSliceCanBeFiltered(t *testing.T) {
 	items := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 	expected := []int{2, 4, 6, 8, 10}
@@ -62,6 +73,21 @@ func TestSliceCanContains(t *testing.T) {
 
 	assert.True(t, core.Contains(items, 1))
 	assert.False(t, core.Contains(items, 6))
+}
+
+func TestSliceFindValueWithFunc(t *testing.T) {
+	items := []Something1{{"1"}, {"2"}, {"3"}, {"4"}, {"5"}}
+
+	result, found := core.FindWithFunc(items, func(item Something1) bool {
+		return item.Data == "3"
+	})
+	assert.True(t, found)
+	assert.Equal(t, Something1{"3"}, result)
+
+	_, found = core.FindWithFunc(items, func(item Something1) bool {
+		return item.Data == "6"
+	})
+	assert.False(t, found)
 }
 
 func TestSliceCanContainsWithFunc(t *testing.T) {
