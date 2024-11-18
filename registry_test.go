@@ -9,35 +9,6 @@ import (
 	. "github.com/gildas/go-core"
 )
 
-type Something interface {
-	TypeCarrier
-	GetData() string
-}
-
-type Something1 struct {
-	Data string `json:"data"`
-}
-
-type Something2 struct {
-	Data string `json:"data"`
-}
-
-func (s Something1) GetType() string {
-	return "something1"
-}
-
-func (s Something1) GetData() string {
-	return s.Data
-}
-
-func (s Something2) GetType() string {
-	return "something2"
-}
-
-func (s Something2) GetData() string {
-	return s.Data
-}
-
 func TestCanCreateTypeRegistry(t *testing.T) {
 	registry := TypeRegistry{}.Add(Something1{}, Something2{})
 	assert.Equal(t, 2, len(registry))

@@ -1,21 +1,12 @@
 package core_test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/gildas/go-core"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
-
-type SomethingMore interface {
-	Something
-	fmt.Stringer
-}
-
-func (something Something2) String() string {
-	return something.Data
-}
 
 func TestSliceCanFindValue(t *testing.T) {
 	items := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
