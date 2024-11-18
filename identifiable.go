@@ -6,3 +6,8 @@ import "github.com/google/uuid"
 type Identifiable interface {
 	GetID() uuid.UUID
 }
+
+// StringIdentifiable describes that can get their Identifier as a string
+type StringIdentifiable interface {
+	GetID() string
+}
