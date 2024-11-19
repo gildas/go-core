@@ -36,6 +36,52 @@ fmt.Println(core.ContainsWithFunc(slice, User{Name: "John"}, func(a, b User) boo
 })) // true
 ```
 
+If the struct implements the `core.Named` interface, you can use the `EqualNamed` method:
+
+```go
+fmt.Println(core.ContainsWithFunc(slice, User{Name: "John"}, core.EqualNamed)) // true
+```
+
+Same goes for `core.Identifiable` and `core.StringIdentifiable` interfaces.
+
+### Find
+
+You can find a value in a slice with `Find` method:
+
+```go
+slice := []int{1, 2, 3, 4, 5}
+number, found := core.Find(slice, 4)
+```
+
+`Find` works with all `comparable` types.
+
+If the slice type is more complex, you can use `FindWithFunc` method:
+
+```go
+type User struct {
+  ID int
+  Name string
+}
+
+slice := []User{
+  {ID: 1, Name: "John"},
+  {ID: 2, Name: "Jane"},
+  {ID: 3, Name: "Bob"},
+}
+
+user, found := core.FindWithFunc(slice, User{Name: "John"}, func(a, b User) bool {
+  return a.Name == b.Name
+})
+```
+
+If the struct implements the `core.Named` interface, you can use the `MatchNamed` method:
+
+```go
+fmt.Println(core.FindWithFunc(slice, User{Name: "John"}, core.MatchNamed)) // true
+```
+
+Same goes for `core.Identifiable` and `core.StringIdentifiable` interfaces.
+
 ### EqualSlices
 
 You can check if two slices are equal with `EqualSlices` method:
