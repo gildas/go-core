@@ -1,21 +1,12 @@
 package core_test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/gildas/go-core"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
-
-type SomethingMore interface {
-	Something
-	fmt.Stringer
-}
-
-func (something Something2) String() string {
-	return something.Data
-}
 
 func TestSliceCanFindValue(t *testing.T) {
 	items := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
@@ -76,25 +67,74 @@ func TestSliceCanContains(t *testing.T) {
 }
 
 func TestSliceFindValueWithFunc(t *testing.T) {
-	items := []Something1{{"1"}, {"2"}, {"3"}, {"4"}, {"5"}}
+	t.Run("Raw", func(t *testing.T) {
+		item := Something1{"3"}
+		items := []Something1{{"1"}, {"2"}, {"3"}, {"4"}, {"5"}}
 
-	result, found := core.FindWithFunc(items, func(item Something1) bool {
-		return item.Data == "3"
-	})
-	assert.True(t, found)
-	assert.Equal(t, Something1{"3"}, result)
+		result, found := core.FindWithFunc(items, func(item Something1) bool {
+			return item.Data == "3"
+		})
+		assert.True(t, found)
+		assert.Equal(t, item, result)
 
-	_, found = core.FindWithFunc(items, func(item Something1) bool {
-		return item.Data == "6"
+		_, found = core.FindWithFunc(items, func(item Something1) bool {
+			return item.Data == "6"
+		})
+		assert.False(t, found)
 	})
-	assert.False(t, found)
+
+	t.Run("Named", func(t *testing.T) {
+		item := Something1{"3"}
+		items := []Something1{{"1"}, {"2"}, {"3"}, {"4"}, {"5"}}
+
+		result, found := core.FindWithFunc(items, core.MatchNamed(item))
+		assert.True(t, found)
+		assert.Equal(t, item, result)
+	})
+
+	t.Run("Identifiable", func(t *testing.T) {
+		item := Something3{uuid.New()}
+		items := []Something3{{uuid.New()}, {uuid.New()}, {uuid.New()}, item, {uuid.New()}}
+
+		result, found := core.FindWithFunc(items, core.MatchIdentifiable(item))
+		assert.True(t, found)
+		assert.Equal(t, item, result)
+	})
+
+	t.Run("StringIdentifiable", func(t *testing.T) {
+		item := Something4{ID: "3"}
+		items := []Something4{{ID: "0"}, {ID: "1"}, {ID: "2"}, item, {ID: "4"}}
+
+		result, found := core.FindWithFunc(items, core.MatchStringIdentifiable(item))
+		assert.True(t, found)
+		assert.Equal(t, item, result)
+	})
 }
 
 func TestSliceCanContainsWithFunc(t *testing.T) {
-	items := []Something1{{"1"}, {"2"}, {"3"}, {"4"}, {"5"}}
+	t.Run("Raw", func(t *testing.T) {
+		items := []Something1{{"1"}, {"2"}, {"3"}, {"4"}, {"5"}}
 
-	assert.True(t, core.ContainsWithFunc(items, Something1{"1"}, func(a, b Something1) bool { return a.Data == b.Data }))
-	assert.False(t, core.ContainsWithFunc(items, Something1{"6"}, func(a, b Something1) bool { return a.Data == b.Data }))
+		assert.True(t, core.ContainsWithFunc(items, Something1{"1"}, func(a, b Something1) bool { return a.Data == b.Data }))
+		assert.True(t, core.ContainsWithFunc(items, Something1{"1"}, core.EqualNamed))
+		assert.False(t, core.ContainsWithFunc(items, Something1{"6"}, func(a, b Something1) bool { return a.Data == b.Data }))
+	})
+
+	t.Run("Identifiable", func(t *testing.T) {
+		item := Something3{uuid.New()}
+		items := []Something3{{uuid.New()}, {uuid.New()}, {uuid.New()}, item, {uuid.New()}}
+
+		assert.True(t, core.ContainsWithFunc(items, item, core.EqualIdentifiable))
+		assert.False(t, core.ContainsWithFunc(items, Something3{uuid.New()}, core.EqualIdentifiable))
+	})
+
+	t.Run("StringIdentifiable", func(t *testing.T) {
+		item := Something4{ID: "3"}
+		items := []Something4{{ID: "0"}, {ID: "1"}, {ID: "2"}, item, {ID: "4"}}
+
+		assert.True(t, core.ContainsWithFunc(items, item, core.EqualStringIdentifiable))
+		assert.False(t, core.ContainsWithFunc(items, Something4{ID: "6"}, core.EqualStringIdentifiable))
+	})
 }
 
 func TestSliceCanBeCompared(t *testing.T) {
