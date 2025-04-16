@@ -359,13 +359,26 @@ func (product Product) GetType() string {
   return "product"
 }
 
-registry := core.NewTypeRegistry()
+registry := core.TypeRegistry{}
 
 registry.Add(User{}, Product{})
 
 var user User
 
 err := registry.UnmarshalJSON([]byte(`{"type": "user", "ID": "00000000-0000-0000-0000-000000000000", "Name": "John"}`), &user)
+if err != nil {
+  panic(err)
+}
+
+fmt.Println(user)
+
+registry := core.CaseInsensitiveTypeRegistry{}
+
+registry.Add(User{}, Product{})
+
+var user User
+
+err := registry.UnmarshalJSON([]byte(`{"type": "UsEr", "ID": "00000000-0000-0000-0000-000000000000", "Name": "John"}`), &user)
 if err != nil {
   panic(err)
 }
