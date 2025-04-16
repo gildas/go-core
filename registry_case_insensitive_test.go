@@ -9,16 +9,16 @@ import (
 	. "github.com/gildas/go-core"
 )
 
-func TestCanCreateTypeRegistry(t *testing.T) {
-	registry := TypeRegistry{}.Add(Something1{}, Something2{})
+func TestCanCreateCaseInsensitiveTypeRegistry(t *testing.T) {
+	registry := CaseInsensitiveTypeRegistry{}.Add(Something1{}, Something2{})
 	assert.Equal(t, 2, len(registry))
 }
 
-func TestCanUnmarshalTypeCarrier(t *testing.T) {
-	registry := TypeRegistry{}.Add(Something1{}, Something2{})
+func TestCanUnmarshalCaseInsensitiveTypeCarrier(t *testing.T) {
+	registry := CaseInsensitiveTypeRegistry{}.Add(Something1{}, Something2{})
 	require.Equal(t, 2, len(registry))
 
-	payload := []byte(`{"type": "something1", "data": "Hello"}`)
+	payload := []byte(`{"type": "SomEthIng1", "data": "Hello"}`)
 	object, err := registry.UnmarshalJSON(payload)
 	require.Nilf(t, err, "Failed to Unmarshal payload: %s", err)
 	require.NotNil(t, object, "Returned object cannot be nil")
@@ -29,11 +29,11 @@ func TestCanUnmarshalTypeCarrier(t *testing.T) {
 	assert.Equal(t, "Hello", value.GetData())
 }
 
-func TestCanUnmarshalTypeCarrierWithTypetag(t *testing.T) {
-	registry := TypeRegistry{}.Add(Something1{}, Something2{})
+func TestCanUnmarshalCaseInsensitiveTypeCarrierWithTypetag(t *testing.T) {
+	registry := CaseInsensitiveTypeRegistry{}.Add(Something1{}, Something2{})
 	require.Equal(t, 2, len(registry))
 
-	payload := []byte(`{"__type": "something1", "data": "Hello"}`)
+	payload := []byte(`{"__type": "soMetHiNg1", "data": "Hello"}`)
 	object, err := registry.UnmarshalJSON(payload, "__type")
 	require.Nilf(t, err, "Failed to Unmarshal payload: %s", err)
 	require.NotNil(t, object, "Returned object cannot be nil")
@@ -44,8 +44,8 @@ func TestCanUnmarshalTypeCarrierWithTypetag(t *testing.T) {
 	assert.Equal(t, "Hello", value.GetData())
 }
 
-func TestShouldFailUnmarshalingTypeCarrierWithoutType(t *testing.T) {
-	registry := TypeRegistry{}.Add(Something1{}, Something2{})
+func TestShouldFailUnmarshalingCaseInsensitiveTypeCarrierWithoutType(t *testing.T) {
+	registry := CaseInsensitiveTypeRegistry{}.Add(Something1{}, Something2{})
 	require.Equal(t, 2, len(registry))
 
 	payload := []byte(`{"data": "Hello"}`)
@@ -54,8 +54,8 @@ func TestShouldFailUnmarshalingTypeCarrierWithoutType(t *testing.T) {
 	assert.Equal(t, `Missing JSON Property "type"`, err.Error())
 }
 
-func TestShouldFailUnmarshalingTypeCarrierWithInvalidType(t *testing.T) {
-	registry := TypeRegistry{}.Add(Something1{}, Something2{})
+func TestShouldFailUnmarshalingCaseInsensitiveTypeCarrierWithInvalidType(t *testing.T) {
+	registry := CaseInsensitiveTypeRegistry{}.Add(Something1{}, Something2{})
 	require.Equal(t, 2, len(registry))
 
 	payload := []byte(`{"type": "something3", "data": "Hello"}`)
@@ -64,18 +64,8 @@ func TestShouldFailUnmarshalingTypeCarrierWithInvalidType(t *testing.T) {
 	assert.Equal(t, `Unsupported Type "something3"`, err.Error())
 }
 
-func TestShouldFailUnmarshalingTypeCarrierWithInvalidCaseType(t *testing.T) {
-	registry := TypeRegistry{}.Add(Something1{}, Something2{})
-	require.Equal(t, 2, len(registry))
-
-	payload := []byte(`{"type": "Something1", "data": "Hello"}`)
-	_, err := registry.UnmarshalJSON(payload)
-	require.NotNil(t, err)
-	assert.Equal(t, `Unsupported Type "Something1"`, err.Error())
-}
-
-func TestShouldFailUnmarshalingTypeCarrierWithInvalidJSON(t *testing.T) {
-	registry := TypeRegistry{}.Add(Something1{}, Something2{})
+func TestShouldFailUnmarshalingCaseInsensitiveTypeCarrierWithInvalidJSON(t *testing.T) {
+	registry := CaseInsensitiveTypeRegistry{}.Add(Something1{}, Something2{})
 	require.Equal(t, 2, len(registry))
 
 	payload := []byte(`{"type": 2", "data": "Hello"}`)
@@ -84,8 +74,8 @@ func TestShouldFailUnmarshalingTypeCarrierWithInvalidJSON(t *testing.T) {
 	assert.Equal(t, "invalid character '\"' after object key:value pair", err.Error())
 }
 
-func TestShouldFailUnmarshalingTypeCarrierWithInvalidJSON2(t *testing.T) {
-	registry := TypeRegistry{}.Add(Something1{}, Something2{})
+func TestShouldFailUnmarshalingCaseInsensitiveTypeCarrierWithInvalidJSON2(t *testing.T) {
+	registry := CaseInsensitiveTypeRegistry{}.Add(Something1{}, Something2{})
 	require.Equal(t, 2, len(registry))
 
 	payload := []byte(`{"type": "something1", "data": 2}`)
