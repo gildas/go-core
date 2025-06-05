@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+
+	"golang.org/x/exp/slices"
 )
 
 // CaseInsensitiveTypeRegistry contains a map of identifier vs Type
@@ -18,6 +20,16 @@ func (registry CaseInsensitiveTypeRegistry) Add(classes ...TypeCarrier) CaseInse
 		registry[strings.ToLower(class.GetType())] = reflect.TypeOf(class)
 	}
 	return registry
+}
+
+// SupportedTypes returns a list of supported types in the registry
+func (registry CaseInsensitiveTypeRegistry) SupportedTypes() []string {
+	supportedTypes := make([]string, 0, len(registry))
+	for key := range registry {
+		supportedTypes = append(supportedTypes, key)
+	}
+	slices.Sort(supportedTypes)
+	return supportedTypes
 }
 
 // UnmarshalJSON unmarshal a payload into a Type Carrier

@@ -44,6 +44,16 @@ func TestCanUnmarshalTypeCarrierWithTypetag(t *testing.T) {
 	assert.Equal(t, "Hello", value.GetData())
 }
 
+func TestCanTypeRegistryGetSupportedTypes(t *testing.T) {
+	registry := TypeRegistry{}.Add(Something1{}, Something2{})
+	require.Equal(t, 2, len(registry))
+
+	types := registry.SupportedTypes()
+	assert.Equal(t, 2, len(types))
+	assert.Contains(t, types, "something1")
+	assert.Contains(t, types, "something2")
+}
+
 func TestShouldFailUnmarshalingTypeCarrierWithoutType(t *testing.T) {
 	registry := TypeRegistry{}.Add(Something1{}, Something2{})
 	require.Equal(t, 2, len(registry))
