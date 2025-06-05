@@ -83,6 +83,52 @@ func TestCanUnmarshalDurationFromGO(t *testing.T) {
 	assert.Equal(t, 2*24*time.Hour, time.Duration(result.Duration))
 }
 
+func TestCanConvertDurationToISO8601(t *testing.T) {
+	duration := core.Duration(2*time.Hour + 30*time.Minute + 15*time.Second)
+	iso := duration.ToISO8601()
+	assert.Equal(t, "PT2H30M15S", iso)
+
+	duration = core.Duration(5 * time.Millisecond)
+	iso = duration.ToISO8601()
+	assert.Equal(t, "PT0.005S", iso)
+
+	duration = core.Duration(2355 * time.Millisecond)
+	iso = duration.ToISO8601()
+	assert.Equal(t, "PT2.355S", iso)
+
+	duration = core.Duration(2 * 24 * time.Hour)
+	iso = duration.ToISO8601()
+	assert.Equal(t, "P2D", iso)
+
+	// TODO: Add support for weeks (ISO8601-2)
+	/*
+		duration = core.Duration(2 * 7 * 24 * time.Hour)
+		iso = duration.ToISO8601()
+		assert.Equal(t, "P2W", iso)
+
+		duration = core.Duration((2 * 7 + 4) * 24 * time.Hour)
+		iso = duration.ToISO8601()
+		assert.Equal(t, "P2W4D", iso)
+	*/
+
+	duration = core.Duration(2 * 365 * 24 * time.Hour)
+	iso = duration.ToISO8601()
+	assert.Equal(t, "P2Y", iso)
+
+	duration = core.Duration(10276*time.Hour + 5*time.Minute + 6*time.Second)
+	t.Logf("Duration: %s", duration)
+	iso = duration.ToISO8601()
+	assert.Equal(t, "P1Y2M3DT4H5M6S", iso)
+}
+
+func TestCanDurationActAsTimeDuration(t *testing.T) {
+	coreDuration := core.Duration(120 * time.Second)
+	timeDuration := time.Duration(120 * time.Second)
+
+	assert.Equal(t, timeDuration, coreDuration.AsDuration(), "AsDuration should return the same value")
+	assert.Equal(t, timeDuration.String(), coreDuration.String(), "String representation should match")
+}
+
 func TestShouldFailUnmarshalDurationWithInvalidPayload(t *testing.T) {
 	var err error
 	var duration core.Duration

@@ -12,6 +12,57 @@ import (
 // Duration is a placeholder so we can add new funcs to the type
 type Duration time.Duration
 
+// AsDuration converts a core.Duration into a time.Duration
+func (duration Duration) AsDuration() time.Duration {
+	return (time.Duration)(duration)
+}
+
+// ToISO8601 converts a Duration to an ISO 8601 duration string
+//
+// This implements ISO 8601-1 (i.e. no weeks)
+func (duration Duration) ToISO8601() string {
+	var buffer strings.Builder
+	years := int(time.Duration(duration).Hours()) / (24 * 365)
+	months := (int(time.Duration(duration).Hours()) / (24 * 30)) % 12
+	days := (int(time.Duration(duration).Hours()) / 24) % 365
+	hours := int(time.Duration(duration).Hours()) % 24
+	minutes := int(time.Duration(duration).Minutes()) % 60
+	seconds := int(time.Duration(duration).Seconds()) % 60
+	milliseconds := int(time.Duration(duration).Milliseconds()) % 1000
+
+	buffer.WriteString("P")
+	if years > 0 {
+		buffer.WriteString(fmt.Sprintf("%dY", years))
+	}
+	if months > 0 {
+		buffer.WriteString(fmt.Sprintf("%dM", months))
+		days = days - (months * 30)
+	}
+	if days > 0 {
+		buffer.WriteString(fmt.Sprintf("%dD", days))
+	}
+	if hours > 0 || minutes > 0 || seconds > 0 || milliseconds > 0 {
+		buffer.WriteString("T")
+	}
+	if hours > 0 {
+		buffer.WriteString(fmt.Sprintf("%dH", hours))
+	}
+	if minutes > 0 {
+		buffer.WriteString(fmt.Sprintf("%dM", minutes))
+	}
+	if seconds > 0 {
+		if milliseconds == 0 {
+			buffer.WriteString(fmt.Sprintf("%dS", seconds))
+		} else {
+			buffer.WriteString(fmt.Sprintf("%d.%03dS", seconds, milliseconds))
+		}
+	} else if milliseconds > 0 {
+		buffer.WriteString(fmt.Sprintf("%d.%03dS", seconds, milliseconds))
+	}
+
+	return buffer.String()
+}
+
 // MarshalJSON marshals this into JSON
 //
 // # The duration is serialized in milliseconds

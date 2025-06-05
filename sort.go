@@ -24,7 +24,7 @@ func partition[T any](items []T, pivot int, sorter func(T, T) bool) int {
 	pivotValue := items[pivot]
 	items[pivot], items[len(items)-1] = items[len(items)-1], items[pivot]
 	storeIndex := 0
-	for i := 0; i < len(items)-1; i++ {
+	for i := range len(items) - 1 {
 		if sorter(items[i], pivotValue) {
 			items[i], items[storeIndex] = items[storeIndex], items[i]
 			storeIndex++

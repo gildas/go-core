@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+
+	"golang.org/x/exp/slices"
 )
 
 // TypeRegistry contains a map of identifier vs Type
@@ -17,6 +19,16 @@ func (registry TypeRegistry) Add(classes ...TypeCarrier) TypeRegistry {
 		registry[class.GetType()] = reflect.TypeOf(class)
 	}
 	return registry
+}
+
+// SupportedTypes returns a list of supported types in the registry
+func (registry TypeRegistry) SupportedTypes() []string {
+	supportedTypes := make([]string, 0, len(registry))
+	for key := range registry {
+		supportedTypes = append(supportedTypes, key)
+	}
+	slices.Sort(supportedTypes)
+	return supportedTypes
 }
 
 // UnmarshalJSON unmarshal a payload into a Type Carrier

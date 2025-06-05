@@ -44,6 +44,16 @@ func TestCanUnmarshalCaseInsensitiveTypeCarrierWithTypetag(t *testing.T) {
 	assert.Equal(t, "Hello", value.GetData())
 }
 
+func TestCanCaseInsensitiveTypeRegistryGetSupportedTypes(t *testing.T) {
+	registry := CaseInsensitiveTypeRegistry{}.Add(Something1{}, Something2{})
+	require.Equal(t, 2, len(registry))
+
+	types := registry.SupportedTypes()
+	assert.Equal(t, 2, len(types))
+	assert.Contains(t, types, "something1")
+	assert.Contains(t, types, "something2")
+}
+
 func TestShouldFailUnmarshalingCaseInsensitiveTypeCarrierWithoutType(t *testing.T) {
 	registry := CaseInsensitiveTypeRegistry{}.Add(Something1{}, Something2{})
 	require.Equal(t, 2, len(registry))
