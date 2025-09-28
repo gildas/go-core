@@ -116,3 +116,16 @@ func TestCanExecEvery(t *testing.T) {
 	time.Sleep(350 * time.Millisecond)
 	assert.Equal(t, 4, count)
 }
+
+func TestCanCalculateExponentialBackoff(t *testing.T) {
+	initialDelay := 1 * time.Second
+	maxDelay := 30 * time.Second
+	jitter := 0.1
+
+	for attempt := 1; attempt <= 10; attempt++ {
+		delay := core.ExponentialBackoff(attempt, initialDelay, maxDelay, jitter)
+		t.Logf("Attempt %d: delay=%s", attempt, delay)
+		assert.GreaterOrEqual(t, delay, initialDelay-time.Duration(jitter*float64(initialDelay)))
+		assert.LessOrEqual(t, delay, maxDelay+time.Duration(jitter*float64(maxDelay)))
+	}
+}
