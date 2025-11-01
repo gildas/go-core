@@ -30,6 +30,7 @@ func TestCanJSONMarshalUUID(t *testing.T) {
 	}{ID: core.UUID(reqid)})
 	require.NoError(t, err, "Cannot marshal UUID")
 	assert.Equal(t, []byte(`{"id":"`+reqid.String()+`"}`), payload)
+	assert.Equal(t, reqid, core.UUID(reqid).GetID())
 
 	payload, err = json.Marshal(struct {
 		ID string `json:"id,omitempty"`
