@@ -50,8 +50,8 @@ func TestSliceCanBeReduced(t *testing.T) {
 }
 
 func TestSliceCanBeSorted(t *testing.T) {
-	items := []int{10, 2, 8, 3, 6, 5, 4, 7, 9, 1}
-	expected := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+	items := []int{10, 2, 8, 3, 6, 5, 5, 4, 7, 9, 1}
+	expected := []int{1, 2, 3, 4, 5, 5, 6, 7, 8, 9, 10}
 
 	core.Sort(items, func(a, b int) bool {
 		return a < b

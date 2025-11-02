@@ -54,6 +54,13 @@ func (id UUID) IsZero() bool {
 	return uuid.UUID(id) == uuid.Nil
 }
 
+// GetID returns the UUID as a uuid.UUID type
+//
+// implements Identifiable
+func (id UUID) GetID() uuid.UUID {
+	return uuid.UUID(id)
+}
+
 // String returns the UUID as a string
 //
 // If the UUID is uuid.Nil, an empty string is returned.

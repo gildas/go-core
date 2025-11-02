@@ -6,7 +6,11 @@
 *.dylib
 
 # Test binary, build with `go test -c`
+.dccache
 *.test
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
+
+# Snyk Security Extension - AI Rules (auto-generated)
+.github/instructions/snyk_rules.instructions.md
