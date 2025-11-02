@@ -199,7 +199,9 @@ fmt.Println(core.Sort(slice, func(a, b int) {
 })) // [1 2 3 4 5]
 ```
 
-The `Sort` method uses a simple Quick Sort algorithm.
+The `Sort` method is an in-place sort, the original slice is modified.
+
+The `Sort` method is now calling the `slices.SortFunc` from the standard library.
 
 ## Time and Duration helpers
 
@@ -289,7 +291,41 @@ The `core.GoString` interface is used to represent an object that can be convert
 
 `core.RespondWithError` is a helper function that marshals an error into an `http.ResponseWriter` as JSON. It also sets the `Content-Type` header to `application/json`.
 
-## Miscelaneous
+The `core.GetReference` function gets a reference of an object, if the object implements `core.Identifiable`, `core.StringIdentifiable`, or `fmt.Stringer`, the reference will use the ID, otherwise it will return the object itself.
+Example:
+
+```go
+type User struct {
+  ID uuid.UUID
+  Name string
+}
+func (user User) GetID() uuid.UUID {
+  return user.ID
+}
+
+core.RespondWithJSON(w, http.StatusAccepted, core.GetReference(user)) // this will send a response like {"id": "12345678-1234-5678-1234-567812345678"}
+```
+
+The `core.Decorate` function gets a decorated object of an object, if the object implements `core.Identifiable`, `core.StringIdentifiable`, or `fmt.Stringer`, the decorated object will contain the object and a `selfURI` field.
+
+Example:
+
+```go
+type User struct {
+  ID uuid.UUID
+  Name string
+}
+
+func (user User) GetID() uuid.UUID {
+  return user.ID
+}
+
+core.RespondWithJSON(w, http.StatusAccepted, core.Decorate(user, "/users"))
+// this will send a response like:
+//  {"id": "12345678-1234-5678-1234-567812345678", "selfURI": "/users/12345678-1234-5678-1234-567812345678"}
+```
+
+## Miscellaneous
 
 `ExecEvery` executes a function every `duration`:
 
