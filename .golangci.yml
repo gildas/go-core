@@ -4,5 +4,7 @@ linters:
   default: standard
 
   settings:
+    govet:
+      disable: ["stdmethods"]
     staticcheck:
       checks: ["all", "-ST1000", "-ST1005"]

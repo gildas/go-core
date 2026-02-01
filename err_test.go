@@ -11,7 +11,7 @@ import (
 
 type TestError struct {
 	ID    string
-	Value interface{}
+	Value any
 }
 
 func (err TestError) Error() string {

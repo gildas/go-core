@@ -34,7 +34,7 @@ func (t Timestamp) MarshalJSON() ([]byte, error) {
 //	The Epoch can be "12345" or 12345
 func (t *Timestamp) UnmarshalJSON(payload []byte) (err error) {
 	// First get rid of the surrounding double quotes
-	unquoted := strings.Replace(string(payload), `"`, ``, -1)
+	unquoted := strings.ReplaceAll(string(payload), `"`, ``)
 	value, err := strconv.ParseInt(unquoted, 10, 64)
 
 	if err != nil {

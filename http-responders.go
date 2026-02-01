@@ -46,7 +46,7 @@ func RespondWithError(w http.ResponseWriter, code int, err error) {
 }
 
 // RespondWithJSON will send a reply with a JSON payload and a HTTP Status code
-func RespondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
+func RespondWithJSON(w http.ResponseWriter, code int, payload any) {
 	response, _ := json.Marshal(payload)
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(code)
@@ -54,7 +54,7 @@ func RespondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 }
 
 // RespondWithHTMLTemplate will send a reply with a HTML payload generated from an HTML Template and a HTTP Status code
-func RespondWithHTMLTemplate(w http.ResponseWriter, code int, template *template.Template, name string, data interface{}) {
+func RespondWithHTMLTemplate(w http.ResponseWriter, code int, template *template.Template, name string, data any) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	if err := template.ExecuteTemplate(w, name, data); err != nil {
 		RespondWithError(w, http.StatusInternalServerError, err)
