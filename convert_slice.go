@@ -2,7 +2,7 @@ package core
 
 import "encoding/json"
 
-// ConvertSliceFromAny converts a slice of any interface to a slice of specific type T.
+// ConvertFromAnySlice converts a slice of any interface to a slice of specific type T.
 //
 // If an item cannot be converted to type T, it is skipped.
 //
@@ -15,8 +15,8 @@ import "encoding/json"
 //
 //	// Convert a slice of any to a slice of strings
 //	anySlice := []any{"one", "two", "three"}
-//	stringSlice := ConvertSliceFromAny[string](anySlice)
-func ConvertSliceFromAny[T any](items []any) []T {
+//	stringSlice := ConvertFromAnySlice[string](anySlice)
+func ConvertFromAnySlice[T any](items []any) []T {
 	slice := make([]T, 0, len(items))
 	for _, item := range items {
 		if v, ok := item.(T); ok {
@@ -32,14 +32,14 @@ func ConvertSliceFromAny[T any](items []any) []T {
 	return slice
 }
 
-// ConvertSliceToAny converts a slice of specific type T to a slice of any interface.
+// ConvertToAnySlice converts a slice of specific type T to a slice of any interface.
 //
 // Example:
 //
 //	// Convert a slice of strings to a slice of any
 //	stringSlice := []string{"one", "two", "three"}
-//	anySlice := ConvertSliceToAny[string](stringSlice)
-func ConvertSliceToAny[T any](items []T) []any {
+//	anySlice := ConvertToAnySlice[string](stringSlice)
+func ConvertToAnySlice[T any](items []T) []any {
 	slice := make([]any, 0, len(items))
 	for _, item := range items {
 		slice = append(slice, item)

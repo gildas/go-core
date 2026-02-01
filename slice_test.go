@@ -201,12 +201,12 @@ func TestSliceCanJoinWithFunc(t *testing.T) {
 
 func TestSliceFromAny(t *testing.T) {
 	anySlice := []any{"one", "two", "three"}
-	stringSlice := core.ConvertSliceFromAny[string](anySlice)
+	stringSlice := core.ConvertFromAnySlice[string](anySlice)
 	expected := []string{"one", "two", "three"}
 	assert.Equal(t, expected, stringSlice)
 
 	anySlice = []any{"one", 2, "three", 4.0, "five"}
-	stringSlice = core.ConvertSliceFromAny[string](anySlice)
+	stringSlice = core.ConvertFromAnySlice[string](anySlice)
 	expected = []string{"one", "three", "five"}
 	assert.Equal(t, expected, stringSlice)
 
@@ -215,25 +215,25 @@ func TestSliceFromAny(t *testing.T) {
 		Age  int    `json:"age"`
 	}
 	anySlice = []any{Stuff{"Alice", 30}, Stuff{"Bob", 25}, "Charlie"}
-	stuffSlice := core.ConvertSliceFromAny[Stuff](anySlice)
+	stuffSlice := core.ConvertFromAnySlice[Stuff](anySlice)
 	expectedStuff := []Stuff{{"Alice", 30}, {"Bob", 25}}
 	assert.Equal(t, expectedStuff, stuffSlice)
 
 	payload := `[{"name": "Alice", "age": 30}, {"name": "Bob", "age": 25}]`
 	err := json.Unmarshal([]byte(payload), &anySlice)
 	require.NoError(t, err)
-	stuffSlice = core.ConvertSliceFromAny[Stuff](anySlice)
+	stuffSlice = core.ConvertFromAnySlice[Stuff](anySlice)
 	assert.Equal(t, expectedStuff, stuffSlice)
 }
 
 func TestSliceToAny(t *testing.T) {
 	stringSlice := []string{"one", "two", "three"}
-	anySlice := core.ConvertSliceToAny(stringSlice)
+	anySlice := core.ConvertToAnySlice(stringSlice)
 	expected := []any{"one", "two", "three"}
 	assert.Equal(t, expected, anySlice)
 
 	intSlice := []int{1, 2, 3, 4, 5}
-	anySlice = core.ConvertSliceToAny(intSlice)
+	anySlice = core.ConvertToAnySlice(intSlice)
 	expectedAny := []any{1, 2, 3, 4, 5}
 	assert.Equal(t, expectedAny, anySlice)
 }
