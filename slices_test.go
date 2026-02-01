@@ -199,7 +199,7 @@ func TestSliceCanJoinWithFunc(t *testing.T) {
 	assert.Equal(t, "", core.JoinWithFunc(items, ", ", func(item Something1) string { return item.Data }))
 }
 
-func TestSliceFromAny(t *testing.T) {
+func TestConvertFromAnySlice(t *testing.T) {
 	anySlice := []any{"one", "two", "three"}
 	stringSlice := core.ConvertFromAnySlice[string](anySlice)
 	expected := []string{"one", "two", "three"}
@@ -226,7 +226,7 @@ func TestSliceFromAny(t *testing.T) {
 	assert.Equal(t, expectedStuff, stuffSlice)
 }
 
-func TestSliceToAny(t *testing.T) {
+func TestConvertToAnySlice(t *testing.T) {
 	stringSlice := []string{"one", "two", "three"}
 	anySlice := core.ConvertToAnySlice(stringSlice)
 	expected := []any{"one", "two", "three"}

@@ -43,7 +43,7 @@ func TestCanReceivePtrToError(t *testing.T) {
 	errValue := reflect.ValueOf(err)
 	require.NotNil(t, errValue)
 	t.Logf("ErrValue: %#v", errValue)
-	assert.True(t, errValue.Type().Kind() == reflect.Ptr, "Error is not a Pointer (%s)", errValue.Type().Kind().String())
+	assert.True(t, errValue.Type().Kind() == reflect.Pointer, "Error is not a Pointer (%s)", errValue.Type().Kind().String())
 
 	errValue = errValue.Elem()
 

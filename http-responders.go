@@ -21,7 +21,7 @@ func RespondWithError(w http.ResponseWriter, code int, err error) {
 	errValue := reflect.ValueOf(err)
 
 	// detect errors like fmt.Errorf()
-	if errValue.Type().Kind() == reflect.Ptr {
+	if errValue.Type().Kind() == reflect.Pointer {
 		errValue = errValue.Elem()
 	}
 
@@ -46,6 +46,8 @@ func RespondWithError(w http.ResponseWriter, code int, err error) {
 }
 
 // RespondWithJSON will send a reply with a JSON payload and a HTTP Status code
+//
+// The payload will be marshaled using the standard json.Marshal function.
 func RespondWithJSON(w http.ResponseWriter, code int, payload any) {
 	response, _ := json.Marshal(payload)
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")

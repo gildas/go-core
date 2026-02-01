@@ -39,7 +39,7 @@ func ConvertFromAnySlice[T any](items []any) []T {
 //	// Convert a slice of strings to a slice of any
 //	stringSlice := []string{"one", "two", "three"}
 //	anySlice := ConvertToAnySlice[string](stringSlice)
-func ConvertToAnySlice[T any](items []T) []any {
+func ConvertToAnySlice[S ~[]T, T any](items S) []any {
 	slice := make([]any, 0, len(items))
 	for _, item := range items {
 		slice = append(slice, item)
