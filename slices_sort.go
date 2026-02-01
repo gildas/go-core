@@ -14,7 +14,7 @@ import "golang.org/x/exp/slices"
 //	Sort(numbers, func(a, b int) bool {
 //		return a < b
 //	})
-func Sort[T any](items []T, sorter func(T, T) bool) {
+func Sort[S ~[]T, T any](items S, sorter func(T, T) bool) {
 	slices.SortFunc(items, func(a, b T) int {
 		if sorter(a, b) {
 			return -1

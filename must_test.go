@@ -24,6 +24,6 @@ func TestMustShouldPanicWithBadArgument(t *testing.T) {
 			t.Errorf("Must() should have panicked")
 		}
 	}()
-	value := core.Must(url.Parse("%%NOT_A_URL!!!"))
+	value := core.Must(url.Parse("%%NOT_A_URL!!!")) // nolint:staticcheck
 	t.Logf("Value is %v", value)
 }

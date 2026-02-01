@@ -1,11 +1,13 @@
 package core_test
 
 import (
+	"encoding/json"
 	"testing"
 
 	"github.com/gildas/go-core"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestSliceCanFindValue(t *testing.T) {
@@ -195,4 +197,43 @@ func TestSliceCanJoinWithFunc(t *testing.T) {
 
 	items = []Something1{}
 	assert.Equal(t, "", core.JoinWithFunc(items, ", ", func(item Something1) string { return item.Data }))
+}
+
+func TestConvertFromAnySlice(t *testing.T) {
+	anySlice := []any{"one", "two", "three"}
+	stringSlice := core.ConvertFromAnySlice[string](anySlice)
+	expected := []string{"one", "two", "three"}
+	assert.Equal(t, expected, stringSlice)
+
+	anySlice = []any{"one", 2, "three", 4.0, "five"}
+	stringSlice = core.ConvertFromAnySlice[string](anySlice)
+	expected = []string{"one", "three", "five"}
+	assert.Equal(t, expected, stringSlice)
+
+	type Stuff struct {
+		Name string `json:"name"`
+		Age  int    `json:"age"`
+	}
+	anySlice = []any{Stuff{"Alice", 30}, Stuff{"Bob", 25}, "Charlie"}
+	stuffSlice := core.ConvertFromAnySlice[Stuff](anySlice)
+	expectedStuff := []Stuff{{"Alice", 30}, {"Bob", 25}}
+	assert.Equal(t, expectedStuff, stuffSlice)
+
+	payload := `[{"name": "Alice", "age": 30}, {"name": "Bob", "age": 25}]`
+	err := json.Unmarshal([]byte(payload), &anySlice)
+	require.NoError(t, err)
+	stuffSlice = core.ConvertFromAnySlice[Stuff](anySlice)
+	assert.Equal(t, expectedStuff, stuffSlice)
+}
+
+func TestConvertToAnySlice(t *testing.T) {
+	stringSlice := []string{"one", "two", "three"}
+	anySlice := core.ConvertToAnySlice(stringSlice)
+	expected := []any{"one", "two", "three"}
+	assert.Equal(t, expected, anySlice)
+
+	intSlice := []int{1, 2, 3, 4, 5}
+	anySlice = core.ConvertToAnySlice(intSlice)
+	expectedAny := []any{1, 2, 3, 4, 5}
+	assert.Equal(t, expectedAny, anySlice)
 }

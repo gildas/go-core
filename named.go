@@ -5,7 +5,7 @@ type Named interface {
 	GetName() string
 }
 
-// RqualNamed compares two values for equality by name
+// EqualNamed compares two values for equality by name
 func EqualNamed[T Named](a, b T) bool {
 	return a.GetName() == b.GetName()
 }

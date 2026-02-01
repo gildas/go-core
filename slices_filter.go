@@ -10,7 +10,7 @@ package core
 //	numbers := Filter(numbers, func(number int) bool {
 //		return number > 0
 //	})
-func Filter[T any](items []T, filter func(T) bool) (result []T) {
+func Filter[S ~[]T, T any](items S, filter func(T) bool) (result []T) {
 	for _, item := range items {
 		if filter(item) {
 			result = append(result, item)

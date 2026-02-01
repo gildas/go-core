@@ -4,7 +4,7 @@ package core
 //
 // Two slices are equal if they have the same length and
 // all elements of the first slice exist in the second slice. And vice versa.
-func EqualSlices[T comparable](a, b []T) bool {
+func EqualSlices[S ~[]T, T comparable](a, b S) bool {
 	if len(a) != len(b) {
 		return false
 	}
@@ -25,7 +25,7 @@ func EqualSlices[T comparable](a, b []T) bool {
 //
 // Two slices are equal if they have the same length and
 // all elements of the first slice exist in the second slice. And vice versa.
-func EqualSlicesWithFunc[T any](a, b []T, compare func(T, T) bool) bool {
+func EqualSlicesWithFunc[S ~[]T, T any](a, b S, compare func(T, T) bool) bool {
 	if len(a) != len(b) {
 		return false
 	}

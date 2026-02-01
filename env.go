@@ -70,7 +70,7 @@ func GetEnvAsDuration(name string, fallback time.Duration) time.Duration {
 // GetEnvAsURL returns the URL value of an environment variable by its name
 //
 // if not present, the fallback value is used
-func GetEnvAsURL(name string, fallback interface{}) *url.URL {
+func GetEnvAsURL(name string, fallback any) *url.URL {
 	if value, ok := os.LookupEnv(name); ok && len(value) > 0 {
 		if address, err := url.Parse(value); err == nil {
 			return address

@@ -79,7 +79,7 @@ func (duration Duration) MarshalJSON() ([]byte, error) {
 //	an int (int64) will be assumed to be milli-seconds
 //	a string will be parsed as an ISO 8601 then as a GO time.Duration
 func (duration *Duration) UnmarshalJSON(payload []byte) (err error) {
-	var inner interface{}
+	var inner any
 	_ = json.Unmarshal(payload, &inner)
 	switch value := inner.(type) {
 	case float64:

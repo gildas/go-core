@@ -66,7 +66,7 @@ func TestHTTPResponderWithJSON(t *testing.T) {
 	require.NoErrorf(t, err, "Failed to get %s", server.URL)
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 	var payload map[string]string
-	defer res.Body.Close()
+	defer func() { _ = res.Body.Close() }()
 	body, err := io.ReadAll(res.Body)
 	require.NoErrorf(t, err, "Failed to read body of %s", server.URL)
 	err = json.Unmarshal(body, &payload)
@@ -84,7 +84,7 @@ func TestHTTPResponderWithError(t *testing.T) {
 	require.NoErrorf(t, err, "Failed to get %s", server.URL)
 	assert.Equal(t, http.StatusNotFound, res.StatusCode)
 	var payload map[string]string
-	defer res.Body.Close()
+	defer func() { _ = res.Body.Close() }()
 	body, err := io.ReadAll(res.Body)
 	require.NoErrorf(t, err, "Failed to read body of %s", server.URL)
 	err = json.Unmarshal(body, &payload)
@@ -103,7 +103,7 @@ func TestHTTPResponderWithStructuredError(t *testing.T) {
 	require.NoErrorf(t, err, "Failed to get %s", server.URL)
 	assert.Equal(t, http.StatusNotFound, res.StatusCode)
 	var payload map[string]string
-	defer res.Body.Close()
+	defer func() { _ = res.Body.Close() }()
 	body, err := io.ReadAll(res.Body)
 	require.NoErrorf(t, err, "Failed to read body of %s", server.URL)
 	err = json.Unmarshal(body, &payload)
@@ -122,7 +122,7 @@ func TestHTTPResponderWithStructuredErrorWithIdentifiable(t *testing.T) {
 	require.NoErrorf(t, err, "Failed to get %s", server.URL)
 	assert.Equal(t, http.StatusNotFound, res.StatusCode)
 	var payload map[string]string
-	defer res.Body.Close()
+	defer func() { _ = res.Body.Close() }()
 	body, err := io.ReadAll(res.Body)
 	require.NoErrorf(t, err, "Failed to read body of %s", server.URL)
 	err = json.Unmarshal(body, &payload)
@@ -141,7 +141,7 @@ func TestHTTPResponderWithStructuredErrorWithUUID(t *testing.T) {
 	require.NoErrorf(t, err, "Failed to get %s", server.URL)
 	assert.Equal(t, http.StatusNotFound, res.StatusCode)
 	var payload map[string]string
-	defer res.Body.Close()
+	defer func() { _ = res.Body.Close() }()
 	body, err := io.ReadAll(res.Body)
 	require.NoErrorf(t, err, "Failed to read body of %s", server.URL)
 	err = json.Unmarshal(body, &payload)
@@ -160,7 +160,7 @@ func TestHTTPResponderWithHTMLTemplate(t *testing.T) {
 	res, err := http.Get(server.URL)
 	require.NoErrorf(t, err, "Failed to get %s", server.URL)
 	assert.Equal(t, http.StatusOK, res.StatusCode)
-	defer res.Body.Close()
+	defer func() { _ = res.Body.Close() }()
 	body, err := io.ReadAll(res.Body)
 	require.NoErrorf(t, err, "Failed to read body of %s", server.URL)
 	assert.Equal(t, "<html><body><h1>Hello world</h1></body></html>", string(body))
@@ -178,7 +178,7 @@ func TestHTTPResponderWithHTMLTemplateError(t *testing.T) {
 	require.NoErrorf(t, err, "Failed to get %s", server.URL)
 	assert.Equal(t, http.StatusInternalServerError, res.StatusCode)
 	var payload map[string]string
-	defer res.Body.Close()
+	defer func() { _ = res.Body.Close() }()
 	body, err := io.ReadAll(res.Body)
 	require.NoErrorf(t, err, "Failed to read body of %s", server.URL)
 	err = json.Unmarshal(body, &payload)

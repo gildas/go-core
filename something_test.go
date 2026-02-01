@@ -21,12 +21,12 @@ type Something1 struct {
 	Data string `json:"data"`
 }
 
-func (s Something1) GetType() string {
+func (something Something1) GetType() string {
 	return "something1"
 }
 
-func (s Something1) GetData() string {
-	return s.Data
+func (something Something1) GetData() string {
+	return something.Data
 }
 
 func (something Something1) GetName() string {
@@ -41,12 +41,12 @@ type Something2 struct {
 	Data string `json:"data"`
 }
 
-func (s Something2) GetType() string {
+func (something Something2) GetType() string {
 	return "something2"
 }
 
-func (s Something2) GetData() string {
-	return s.Data
+func (something Something2) GetData() string {
+	return something.Data
 }
 
 type Something3 struct {
