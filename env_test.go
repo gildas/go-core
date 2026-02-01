@@ -12,9 +12,9 @@ import (
 )
 
 func TestCanGetEnvAsString(t *testing.T) {
-	os.Setenv("TEST", "hello")
+	_ = os.Setenv("TEST", "hello")
 	defer func() {
-		os.Unsetenv("TEST")
+		_ = os.Unsetenv("TEST")
 	}()
 
 	value := core.GetEnvAsString("TEST", "world")
@@ -25,27 +25,27 @@ func TestCanGetEnvAsString(t *testing.T) {
 }
 
 func TestCanGetEnvAsBool(t *testing.T) {
-	os.Setenv("TEST", "true")
+	_ = os.Setenv("TEST", "true")
 	defer func() {
-		os.Unsetenv("TEST")
+		_ = os.Unsetenv("TEST")
 	}()
 
 	value := core.GetEnvAsBool("TEST", false)
 	assert.Equal(t, true, value)
 
-	os.Setenv("TEST", "TruE")
+	_ = os.Setenv("TEST", "TruE")
 	value = core.GetEnvAsBool("TEST", false)
 	assert.Equal(t, true, value)
 
-	os.Setenv("TEST", "1")
+	_ = os.Setenv("TEST", "1")
 	value = core.GetEnvAsBool("TEST", false)
 	assert.Equal(t, true, value)
 
-	os.Setenv("TEST", "on")
+	_ = os.Setenv("TEST", "on")
 	value = core.GetEnvAsBool("TEST", false)
 	assert.Equal(t, true, value)
 
-	os.Setenv("TEST", "yes")
+	_ = os.Setenv("TEST", "yes")
 	value = core.GetEnvAsBool("TEST", false)
 	assert.Equal(t, true, value)
 
@@ -54,9 +54,9 @@ func TestCanGetEnvAsBool(t *testing.T) {
 }
 
 func TestCanGetEnvAsInt(t *testing.T) {
-	os.Setenv("TEST", "12")
+	_ = os.Setenv("TEST", "12")
 	defer func() {
-		os.Unsetenv("TEST")
+		_ = os.Unsetenv("TEST")
 	}()
 
 	value := core.GetEnvAsInt("TEST", 100)
@@ -68,9 +68,9 @@ func TestCanGetEnvAsInt(t *testing.T) {
 
 func TestCanGetEnvAsTime(t *testing.T) {
 	now := time.Now()
-	os.Setenv("TEST", now.Format(time.RFC3339))
+	_ = os.Setenv("TEST", now.Format(time.RFC3339))
 	defer func() {
-		os.Unsetenv("TEST")
+		_ = os.Unsetenv("TEST")
 	}()
 
 	value := core.GetEnvAsTime("TEST", now.Add(24*time.Hour))
@@ -81,9 +81,9 @@ func TestCanGetEnvAsTime(t *testing.T) {
 }
 
 func TestCanGetEnvAsDuration(t *testing.T) {
-	os.Setenv("TEST", "12s")
+	_ = os.Setenv("TEST", "12s")
 	defer func() {
-		os.Unsetenv("TEST")
+		_ = os.Unsetenv("TEST")
 	}()
 
 	value := core.GetEnvAsDuration("TEST", 100*time.Second)
@@ -95,9 +95,9 @@ func TestCanGetEnvAsDuration(t *testing.T) {
 
 func TestCanGetEnvAsURL(t *testing.T) {
 	testURL, _ := url.Parse("https://www.acme.com")
-	os.Setenv("TEST", testURL.String())
+	_ = os.Setenv("TEST", testURL.String())
 	defer func() {
-		os.Unsetenv("TEST")
+		_ = os.Unsetenv("TEST")
 	}()
 
 	value := core.GetEnvAsURL("TEST", "http://localhost")
@@ -124,11 +124,11 @@ func TestPanicGetEnvAsURLWithInvalidFallback(t *testing.T) {
 
 func TestCanGetEnvAsUUID(t *testing.T) {
 	expected := uuid.New()
-	os.Setenv("TEST", expected.String())
-	os.Setenv("WRONG", "not a UUID")
+	_ = os.Setenv("TEST", expected.String())
+	_ = os.Setenv("WRONG", "not a UUID")
 	defer func() {
-		os.Unsetenv("TEST")
-		os.Unsetenv("WRONG")
+		_ = os.Unsetenv("TEST")
+		_ = os.Unsetenv("WRONG")
 	}()
 
 	value := core.GetEnvAsUUID("TEST", uuid.New())
