@@ -129,3 +129,39 @@ func TestCanCalculateExponentialBackoff(t *testing.T) {
 		assert.LessOrEqual(t, delay, maxDelay+time.Duration(jitter*float64(maxDelay)))
 	}
 }
+
+func TestCappedString(t *testing.T) {
+	value := "This is a long string"
+	capped := core.CappedString(value, 10)
+	assert.Equal(t, "This is...", capped)
+
+	value = "Short"
+	capped = core.CappedString(value, 10)
+	assert.Equal(t, "Short", capped)
+
+	value = "ExactLength"
+	capped = core.CappedString(value, 11)
+	assert.Equal(t, "ExactLength", capped)
+
+	value = "This is a long string"
+	capped = core.CappedString(value, 3)
+	assert.Equal(t, "Thi", capped)
+}
+
+func TestCappedStringWith(t *testing.T) {
+	value := "This is a long string"
+	capped := core.CappedStringWith(value, 10, " (more)")
+	assert.Equal(t, "Thi (more)", capped)
+
+	value = "Short"
+	capped = core.CappedStringWith(value, 10, " (more)")
+	assert.Equal(t, "Short", capped)
+
+	value = "ExactLength"
+	capped = core.CappedStringWith(value, 11, " (more)")
+	assert.Equal(t, "ExactLength", capped)
+
+	value = "This is a long string"
+	capped = core.CappedStringWith(value, 4, " (more)")
+	assert.Equal(t, "This", capped)
+}
