@@ -16,7 +16,7 @@ func TimestampNow() Timestamp {
 
 // TimestampFromJSEpoch returns a Timestamp from a JS Epoch
 func TimestampFromJSEpoch(epoch int64) Timestamp {
-	return Timestamp(time.Unix(epoch/1000, (epoch%1000)*1000000))
+	return Timestamp(time.Unix(epoch/1000, (epoch%1000)*1000000).UTC())
 }
 
 // MarshalJSON encodes a TimeStamp to its JSON Epoch
