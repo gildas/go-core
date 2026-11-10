@@ -94,7 +94,7 @@ func TestShouldFailUnmarshalTimeWithInvalidPayload(t *testing.T) {
 
 	err = json.Unmarshal([]byte(`{"time":12}`), &data)
 	require.Error(t, err, "should fail to unmarshal Time")
-	assert.Equal(t, "json: cannot unmarshal number into Go struct field .time of type string", err.Error())
+	assert.Equal(t, "json: cannot unmarshal number into Go value of type string", err.Error())
 }
 
 func TestCanParseTime(t *testing.T) {

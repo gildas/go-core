@@ -117,5 +117,5 @@ func TestShoudFailUnmarshalURLWithInvalidPayload(t *testing.T) {
 
 	err = json.Unmarshal([]byte(`{"link":12}`), &data)
 	require.Error(t, err, "should fail to unmarshal URL")
-	assert.Equal(t, `json: cannot unmarshal number into Go struct field .link of type string`, err.Error())
+	assert.Equal(t, `json: cannot unmarshal number into Go value of type string`, err.Error())
 }
